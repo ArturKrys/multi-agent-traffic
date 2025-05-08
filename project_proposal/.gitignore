@@ -1,0 +1,8 @@
+// generated files from latex
+*.aux
+*.fdb_latexmk
+*.fls
+*log
+*.gz
+*.out
+*.bib

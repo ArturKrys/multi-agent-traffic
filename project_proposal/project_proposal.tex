@@ -1,0 +1,116 @@
+% Sample ACM 2-column Article Template for Project Proposal
+% Filename: project_proposal_template.tex
+
+\documentclass[sigconf,review]{acmart}
+
+% Turn off ACM reference format and copyright info for draft
+\settopmatter{printacmref=false}
+\setcopyright{none}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+
+% Packages
+\usepackage{graphicx}           % for figures
+\let\Bbbk\relax		% Avoid \Bbbk command clash from amssymb
+\usepackage{amsmath, amssymb}   % for math
+\usepackage{subcaption}         % for sub-figures
+\usepackage{booktabs}           % for tables
+\usepackage{hyperref}           % for hyperlinks
+\usepackage{cleveref}           % for \cref
+
+% Graphics path
+\graphicspath{{images/}}
+
+% Metadata
+\title[Project Proposal]{Project Proposal: Multi Agent of traffic problem}
+
+% Three authors
+\author{Artur Krystopchuk}
+\affiliation{%
+  \institution{Instituto Superior Tecnico}
+  \country{Porugal}
+  \city{}
+}
+\email{arturkrystopchuk@tecnico.ulisboa.pt}
+
+\author{Tiago Rodrigues Vieira da Silva}
+\affiliation{%
+  \institution{Instituto Superior Tecnico}
+  \country{Porugal}
+  \city{}
+}
+\email{author2@example.com}
+
+\author{	Tiago Ramos da Rocha Neves Caixinha}
+\affiliation{%
+  \institution{Instituto Superior Tecnico}
+  \country{Porugal}
+  \city{}
+}
+\email{author3@example.com}
+
+\begin{document}
+
+\begin{comment}
+
+	\begin{abstract}
+	% Brief overview (max 150 words)
+	I don't think we need this
+	\end{abstract}
+
+	% Keywords (optional)
+	\keywords{project proposal, ACM template, multi-agent systems}
+
+\end{comment}
+
+\maketitle
+
+%==============================
+\section{Introduction}
+\label{sec:intro}
+\subsection{Motivation}
+% Describe the motivation behind the project.
+
+\subsection{Related Work}
+% Summarize key related literature and gap.
+
+\subsection{Problem Definition and Relevance}
+% Define the problem formally and state its relevance.
+
+\subsection{Objectives}
+% List the objectives of the project.
+
+%==============================
+\section{Approach and System Design}
+\label{sec:approach}
+% Describe environment, (multi-)agent system, architecture.
+% Justify design choices.
+
+% Example figure inclusion:
+% \begin{figure}[ht]
+%   \centering
+%   \includegraphics[width=0.45\linewidth]{system_architecture}
+%   \caption{System architecture overview.}
+%   \label{fig:architecture}
+% \end{figure}
+
+%==============================
+\section{Empirical Evaluation}
+\label{sec:evaluation}
+% Define metrics and describe experimental setup.
+
+% Example table:
+% \begin{table}[ht]
+%   \centering
+%   \begin{tabular}{lrr}
+%     \toprule
+%     Metric & Description & Target \\
+%     \midrule
+%     Accuracy & Classification accuracy & $>90\%$ \\
+%     Response Time & Avg. response time (ms) & $<100$ \\
+%     \bottomrule
+%   \end{tabular}
+%   \caption{Evaluation metrics and targets.}
+%   \label{tab:metrics}
+% \end{table}
+
+\end{document}
