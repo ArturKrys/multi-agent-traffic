@@ -3,81 +3,38 @@
 #let cuhk = super(sym.suit.spade)
 
 #let title = [
-  Insert Your Title Here∗
+  AASMA Project Proposal
 ]
 #let authors = (
-  // You can use grouped affiliations with mark
   (
-    name: [Junliang Hu],
-    email: [jlhu\@cse.cuhk.edu.hk],
-    mark: cuhk,
+    name: "Artur Krystopchuk",
+    email: "email2@email.com",
+    mark: super(sym.suit.diamond),
   ),
   (
-    // Should I use string or content? It doesn't matter
-    name: "FirstName1 Surname1",
+    name: "Tiago Caixinha",
     email: "email1@email.com",
     mark: super(sym.suit.diamond),
   ),
   (
-    // Should I use string or content? It doesn't matter
-    name: "FirstName2 Surname2",
-    email: "email2@email.com",
+    name: "Tiago Vieira da Silva",
+    email: "tiagovsilva@tecnico.ulisboa.pt",
     mark: super(sym.suit.diamond),
   ),
-  // Or you can put affiliations directly in the author list
-  // (
-  //   name: [FirstName Surname],
-  //   email: [email\@email.com],
-  //   // You can put any thing here, and they will automatically be appended below the author name
-  //   department: [Department of Computer Science and Engineering],
-  //   institute: [The Chinese University of Hong Kong],
-  //   city: [Hong Kong],
-  // ),
 )
 #let affiliations = (
   (
-    name: [The Chinese University of Hong Kong],
+    name: "Instituto Superior Técnico",
     mark: cuhk,
-    department: [Department of Computer Science and Engineering],
-    // You can put any thing here, and they will automatically be appended below
-    // city: [Hong Kong],
-  ),
-  (
-    name: [Institution/University Name],
-    mark: super(sym.suit.diamond),
-    department: [Department Name],
-  ),
-  // More affiliations
-)
-#let conference = (
-  name:  [ACM SIGOPS 31th Symposium on Operating Systems Principles],
-  short: [SOSP ’25],
-  year:  [2025],
-  date:  [October 13–16],
-  venue: [Seoul, Republic of Korea],
-)
-#let doi = "https://doi.org/10.1145/0000000000"
-#let ccs = (
-  (
-    generic: [Software and its engineering],
-    specific: ([Virtual machines], [Virtual memory], ),
-  ),
-  (
-    generic: [Computer systems organization],
-    specific: ([Heterogeneous (hybrid) systems], ),
+    department: "Departmento de Engenharia Informática",
+    course: "Agentes Autónomos e Sistemas Multi-Agentes"
   ),
 )
-#let keywords = ("Virtual machine", "Virtual memory", "Operating system", )
 
 #show: acmart.with(
   title: title,
   authors: authors,
   affiliations: affiliations,
-  conference: conference,
-  doi: doi,
-  copyright: "cc",
-  // Set review to submission ID for the review process or to "none" for the final version.
-  // review: [\#001],
 )
 
 
@@ -85,9 +42,6 @@
 The process of scientific writing is often tangled up with the intricacies of typesetting, leading to frustration and wasted time for researchers. In this paper, we introduce Typst, a new typesetting system designed specifically for scientific writing.
 Typst untangles the typesetting process, allowing researchers to compose papers faster. In a series of experiments we demonstrate that Typst offers several advantages, including faster document creation, simplified syntax, and increased ease-of-use.
 
-#acmart-ccs(ccs)
-#acmart-keywords(keywords)
-#acmart-ref(to-string(title), authors, conference, doi)
 
 = Introduction
 Scientific writing is a crucial part of the research process, allowing researchers to share their findings with the wider scientific community. However, the process of typesetting scientific documents can often be a frustrating and time-consuming affair, particularly when using outdated tools such as LaTeX. Despite being over 30 years old, it remains a popular choice for scientific writing due to its power and flexibility. However, it also comes with a steep learning curve, complex syntax, and long compile times, leading to frustration and despair for many researchers @netwok2020 @netwok2022.
