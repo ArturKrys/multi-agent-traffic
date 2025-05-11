@@ -44,23 +44,33 @@
   copyright: none,
 )
 
+= Abstract
+
+This project proposal outlines a multi-agent simulation framework to study the impact of autonomous vehicles (AVs) on traffic flow dynamics in a circular single-lane highway. By integrating human-driven vehicle models based on the Intelligent Driver Model (IDM) with various AV decision-making strategies, we aim to analyze how different AV behaviors and penetration rates influence system-level traffic dynamics. The empirical evaluation will focus on metrics such as traffic flow rate, average speed, speed variance, and wave dissipation times to quantify the thresholds at which AVs significantly mitigate phantom jams and enhance throughput. The insights gained from this work will inform optimal traffic management strategies in mixed-traffic environments.
+
 = Introduction
 
 == Motivation
+Traffic congestion is a persistent problem in urban environments, costing billions in lost productivity and fuel wastage while increasing pollution.
+The viral video "The Simple Solution to Traffic" [1] demonstrates how human driving behaviors, specifically unnecessary braking and acceleration patterns, create "phantom traffic jams" that propagate backward through a line of vehicles.
+
 Phantom traffic jams—stop-and-go waves that arise on busy roads without obstacles—are caused by drivers' delayed reactions and uneven braking/acceleration. These jams waste time and fuel, increase pollution, and raise crash risks. While adding lanes might help, autonomous vehicles (AVs), as shown in the video @cgpgrey2017traffic, have greater potential to improve safety and efficiency. By using precise control and coordinated driving algorithms, AVs can smooth traffic flow and reduce these unnecessary costs.
 
 == Related Work
-We found a lot of studies about traffic flow dynamics, how AVs could help and the results of some algorithms used like "Traffic Flow Dynamics: Data, Models and Simulation" @Treiber2013 and "Opportunities for multiagent systems and multiagent reinforcement learning in traffic control" @Bazzan2009. The article we the most similar to our project is "How Autonomous and Human-Driven Vehicles interact in a Roundabout" @laura2023.
+Traffic flow dynamics have been extensively studied in transportation engineering. In the same light, although not as extensively studied, there are still a considerable number of studies related to how AVs could help traffic flow. Some of these studies, like "Traffic Flow Dynamics: Data, Models and Simulation" @Treiber2013, "Opportunities for multiagent systems and multiagent reinforcement learning in traffic control" @Bazzan2009 and "How Autonomous and Human-Driven Vehicles interact in a Roundabout" @laura2023 provide valuable insights into the potential of AVs to improve traffic efficiency and stability.
+
+However, most of these studies focus on specific scenarios or vehicle types, leaving a gap in understanding how AVs can be integrated into existing traffic systems. The work "The impact of connected and autonomous vehicles on traffic flow stability" @sugiyama2008 provides a comprehensive overview of the potential benefits of AVs in traffic flow dynamics, but it does not explore the effects of varying penetration rates or cooperative behaviors.
 
 == Problem definition and relevance
 With this project we pretend to addresses the following problem: How do varying percentages of autonomous vehicles with different cooperative behaviors impact traffic flow stability and throughput in a circular single-lane highway?
+
 We are looking to understand:
 - The minimum penetration rate of AVs needed to significantly improve traffic flow
-- From 2 different algorithms identify optimal driving strategies for AVs to dampen traffic waves
+- From different algorithms identify optimal driving strategies for AVs to dampen traffic waves
 - Quantifying emergent system-level benefits from local autonomous vehicle decision-making
 
 == Objectives
-The project aims to:
+This project aims to:
 - Develop a multi-agent simulation of a circular single-lane highway with mixed vehicle populations
 - Implement and compare four decision-making algorithms for autonomous vehicles where two of them we will use as baseline (greedy and random)
 - Analyze the impact of varying penetration rates of autonomous vehicles on traffic stability
@@ -125,11 +135,11 @@ The multi-agent approach is particularly suitable for this problem because:
 == Metrics
 The following metrics will be used to evaluate the system's performance:
 
-+*Traffic Flow Rate*: The number of vehicles passing a fixed point per unit time
-+*Average Vehicle Speed*: The mean speed across all vehicles
-+*Speed Variance*: The variance in speeds across vehicles (indicating stability)
-+*Wave Formation Time*: How quickly traffic waves form after an initial perturbation
-+*Wave Dissipation Time*: How quickly traffic waves dissipate after formation
+  - *Traffic Flow Rate*: The number of vehicles passing a fixed point per unit time
+  - *Average Vehicle Speed*: The mean speed across all vehicles
+  - *Speed Variance*: The variance in speeds across vehicles (indicating stability)
+  - *Wave Formation Time*: How quickly traffic waves form after an initial perturbation
+  - *Wave Dissipation Time*: How quickly traffic waves dissipate after formation
 
 = Conclusion
 In this project, we present multi-agent framework to study the impact of autonomous vehicles in a circular single-lane highway. By combining human-driven vehicle models based on the Intelligent Driver Model (IDM) with various autonomous driving strategies, we aim to dissect how different AV behaviors and penetration rates influence system-level traffic dynamics. Our empirical evaluation, guided by metrics such as traffic flow rate, average speed, speed variance, and wave dissipation times, will quantify the thresholds at which AVs significantly mitigate phantom jams and enhance throughput. The insights gained from this work will inform what is the best traffic management strategies in mixed-traffic environments. Ultimately, our findings will most likely show how AVs contribute to safer and more effiecient road networks.
