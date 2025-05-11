@@ -123,6 +123,13 @@ The multi-agent approach is particularly suitable for this problem because:
 = Empirical Evaluation
 
 == Metrics
+The following metrics will be used to evaluate the system's performance:
+
++Traffic Flow Rate: The number of vehicles passing a fixed point per unit time
++Average Vehicle Speed: The mean speed across all vehicles
++Speed Variance: The variance in speeds across vehicles (indicating stability)
++Wave Formation Time: How quickly traffic waves form after an initial perturbation
++Wave Dissipation Time: How quickly traffic waves dissipate after formation
 
 = Conclusion
 
