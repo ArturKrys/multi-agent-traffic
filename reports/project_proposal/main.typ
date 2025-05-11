@@ -3,7 +3,7 @@
 #let cuhk = super(sym.suit.spade)
 
 #let title = [
-  AASMA Project Proposal
+  Multi-Agent System for Phantom Traffic Jam Mitigation
 ]
 #let authors = (
   (
@@ -35,83 +35,85 @@
   title: title,
   authors: authors,
   affiliations: affiliations,
+  conference: "AASMA",
+  review: none,
+  copyright: none
 )
 
-
 = Abstract
-The process of scientific writing is often tangled up with the intricacies of typesetting, leading to frustration and wasted time for researchers. In this paper, we introduce Typst, a new typesetting system designed specifically for scientific writing.
-Typst untangles the typesetting process, allowing researchers to compose papers faster. In a series of experiments we demonstrate that Typst offers several advantages, including faster document creation, simplified syntax, and increased ease-of-use.
-
 
 = Introduction
-Scientific writing is a crucial part of the research process, allowing researchers to share their findings with the wider scientific community. However, the process of typesetting scientific documents can often be a frustrating and time-consuming affair, particularly when using outdated tools such as LaTeX. Despite being over 30 years old, it remains a popular choice for scientific writing due to its power and flexibility. However, it also comes with a steep learning curve, complex syntax, and long compile times, leading to frustration and despair for many researchers @netwok2020 @netwok2022.
 
-== Paper overview
-In this paper we introduce Typst, a new typesetting system designed to streamline the scientific writing process and provide researchers with a fast, efficient, and easy-to-use alternative to existing systems. Our goal is to shake up the status quo and offer researchers a better way to approach scientific writing.
+== Motivation
 
-By leveraging advanced algorithms and a user-friendly interface, Typst offers several advantages over existing typesetting systems, including faster document creation, simplified syntax, and increased ease-of-use.
+== Related Work
 
-To demonstrate the potential of Typst, we conducted a series of experiments comparing it to other popular typesetting systems, including LaTeX. Our findings suggest that Typst offers several benefits for scientific writing, particularly for novice users who may struggle with the complexities of LaTeX. Additionally, we demonstrate that Typst offers advanced features for experienced users, allowing for greater customization and flexibility in document creation.
+== Problem Definition and Relevance
 
-Overall, we believe that Typst represents a significant step forward in the field of scientific writing and typesetting, providing researchers with a valuable tool to streamline their workflow and focus on what really matters: their research. In the following sections, we will introduce Typst in more detail and provide evidence for its superiority over other typesetting systems in a variety of scenarios.
+== Objectives
 
-= Methods <sec:methods>
-#set math.equation(numbering: "1.")
-#lorem(45)
+= Approach
 
-$ a + b = gamma $ <eq:gamma>
+== Environment Specification
+The simulation environment will consist of a circular single-lane highway where vehicles cannot change lanes or overtake, similar to the experimental setup in  @sugiyama2008.
 
-#lorem(80)
+The environment will be discretized into cells, with vehicles occupying each one cell. Time will progress in discrete steps. The state of the environment at any time step includes the positions, velocities, and accelerations of all vehicles.
 
-#figure(
-  placement: none,
-  circle(radius: 15pt),
-  caption: [A circle representing the Sun.]
-) <fig:sun>
+The simulation will be run for a fixed duration, with vehicles initialized in a random distribution to create a variety of traffic conditions. The initial state will include a mix of human-driven and autonomous vehicles, with the proportion of each type varying across experiments.
 
-In @fig:sun you can see a common representation of the Sun, which is a star that is located at the center of the solar system.
+The simulation will also include a mechanism for introducing perturbations (e.g., random braking events) to trigger phantom jams. These perturbations will be introduced at random intervals and locations to simulate real-world conditions.
 
-#lorem(120)
+== Multi-Agent System Design
 
-#figure(
-  caption: [The Planets of the Solar System and Their Average Distance from the Sun],
-  placement: top,
-  table(
-    // Table styling is not mandated by the IEEE. Feel free to adjust these
-    // settings and potentially move them into a set rule.
-    columns: (6em, auto),
-    align: (left, right),
-    inset: (x: 8pt, y: 4pt),
-    stroke: (x, y) => if y <= 1 { (top: 0.5pt) },
-    fill: (x, y) => if y > 0 and calc.rem(y, 2) == 0  { rgb("#efefef") },
+The system will consist of two types of agents:
 
-    table.header[Planet][Distance (million km)],
-    [Mercury], [57.9],
-    [Venus], [108.2],
-    [Earth], [149.6],
-    [Mars], [227.9],
-    [Jupiter], [778.6],
-    [Saturn], [1,433.5],
-    [Uranus], [2,872.5],
-    [Neptune], [4,495.1],
-  )
-) <tab:planets>
+1. *Human-driven vehicle agents*: 
+These agents will follow realistic human driving behaviors including delayed reaction times, unnecessary braking, and suboptimal following distances. Their Implementation will follow a car-following model based on the Intelligent Driver Model (IDM) @treiber2000, which captures realistic human driving behavior including:
+   - Finite reaction times
+   - Imperfect perception
+   - Tendency to maintain safe distances that grow with speed
+   - Some degree of randomness in behavior
 
-In @tab:planets, you see the planets of the solar system and their average distance from the Sun.
-The distances were calculated with @eq:gamma that we presented in @sec:methods.
+2. *Autonomous/connected vehicle agents*:
 
-#lorem(240)
+These agents will implement optimal driving strategies with perfect sensing of nearby vehicles and minimal reaction times. Multiple decision-making approaches will be implemented for these agents such as:
+   - Rule-based: Simple rules for maintaining safe distances and speeds such as bilateral control (maintaining equal distance to front and rear vehicles) and wave-dampening (actively counteracting detected traffic waves)
+   - Collaborative sensing: Sharing information about traffic conditions ahead
+   - Reinforcement Learning: Learning optimal policies through trial and error in simulated environments
 
-#lorem(240)
+This approaches might change the further we go into the project and course.
 
-= Acknowledgement
-#lorem(20)
+== System Architecture
 
-#bibliography("refs.bib", title: "References", style: "association-for-computing-machinery")
+The system will be implemented with the following components:
 
-#colbreak(weak: true)
-#set heading(numbering: "A.a.a")
+1. *Environment Module*: Manages the physical aspects of the circular highway, enforces physical constraints, and updates vehicle positions based on their actions.
+2. *Agent Module*: Implements the decision-making algorithms for both HDVs and AVs, with distinct submodules for different AV strategies.
+3. *Observation Module*: Collects and processes data about the simulation state for analysis.
 
-= Artifact Appendix
-In this section we show how to reproduce our findings.
+The system will be implemented in Python, utilizing libraries such as NumPy for numerical computations and Matplotlib for visualization. For the multi-agent framework, either Mesa or a custom implementation will be used depending on computational efficiency requirements.
 
+== Design Choices Rationale
+
+The circular single-lane design is chosen to isolate the phantom traffic jam phenomenon from other complexities like intersections and lane changes. This allows for a clearer analysis of the effects of different vehicle types and coordination strategies. This environment has been validated in real-world experiments @sugiyama2008 and provides a controlled setting to analyze the impact of AVs on traffic dynamics.
+
+The IDM model is selected for human-driven vehicles due to its balance between realism and computational efficiency. It captures essential human driving behaviors while being simple enough to implement in a multi-agent framework.
+
+The multi-agent approach is particularly suitable for this problem because:
+
+1. Traffic is inherently a distributed system with no central controller
+2. Vehicle behaviors and interactions are complex and heterogeneous
+3. Coordination strategies can be implemented and tested incrementally
+4. The approach scales well to realistic traffic scenarios
+
+= Empirical Evaluation
+
+== Metrics
+
+= Conclusion
+
+#bibliography(
+  "refs.bib",
+  title: "References",
+  style: "ieee",
+)
