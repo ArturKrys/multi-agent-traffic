@@ -3,26 +3,26 @@
 #let cuhk = super(sym.suit.spade)
 
 #let title = [
-Autonomous Vehicles in Circular Highway Traffic System: A Multi-Agent Approach to Traffic Flow Optimization
+  Autonomous Vehicles in Circular Highway Traffic System: A Multi-Agent Approach to Traffic Flow Optimization
 ]
 #let authors = (
   (
     name: "Artur Krystopchuk",
-    email: "email2@email.com",
+    email: "arturkrystopchuk@tecnico.ulisboa.pt",
     mark: super(sym.suit.diamond),
-    istid: "istXXXXXX"
+    istid: "ist1104145",
   ),
   (
     name: "Tiago Caixinha",
     email: "email1@email.com",
     mark: super(sym.suit.diamond),
-    istid: "istXXXXXX"
+    istid: "istXXXXXX",
   ),
   (
     name: "Tiago Vieira da Silva",
     email: "tiagovsilva@tecnico.ulisboa.pt",
     mark: super(sym.suit.diamond),
-    istid: "ist199335"
+    istid: "ist199335",
   ),
 )
 #let affiliations = (
@@ -41,25 +41,35 @@ Autonomous Vehicles in Circular Highway Traffic System: A Multi-Agent Approach t
   affiliations: affiliations,
   conference: "AASMA",
   review: none,
-  copyright: none
+  copyright: none,
 )
-
-= Abstract
 
 = Introduction
 
 == Motivation
+Phantom traffic jams—stop-and-go waves that arise on busy roads without obstacles—are caused by drivers' delayed reactions and uneven braking/acceleration. These jams waste time and fuel, increase pollution, and raise crash risks. While adding lanes might help, autonomous vehicles (AVs), as shown in the video @cgpgrey2017traffic, have greater potential to improve safety and efficiency. By using precise control and coordinated driving algorithms, AVs can smooth traffic flow and reduce these unnecessary costs.
 
 == Related Work
+We found a lot of studies about traffic flow dynamics, how AVs could help and the results of some algorithms used like "Traffic Flow Dynamics: Data, Models and Simulation" @Treiber2013 and "Opportunities for multiagent systems and multiagent reinforcement learning in traffic control" @Bazzan2009. The article we the most similar to our project is "How Autonomous and Human-Driven Vehicles interact in a Roundabout" @laura2023.
 
-== Problem Definition and Relevance
+== Problem definition and relevance
+With this project we pretend to addresses the following problem: How do varying percentages of autonomous vehicles with different cooperative behaviors impact traffic flow stability and throughput in a circular single-lane highway?
+We are looking to understand:
+- The minimum penetration rate of AVs needed to significantly improve traffic flow
+- From 2 different algorithms identify optimal driving strategies for AVs to dampen traffic waves
+- Quantifying emergent system-level benefits from local autonomous vehicle decision-making
 
 == Objectives
+The project aims to:
+- Develop a multi-agent simulation of a circular single-lane highway with mixed vehicle populations
+- Implement and compare four decision-making algorithms for autonomous vehicles where two of them we will use as baseline (greedy and random)
+- Analyze the impact of varying penetration rates of autonomous vehicles on traffic stability
+- Investigate whether local cooperative behaviors can produce global traffic flow optimization
 
 = Approach
 
 == Environment Specification
-The simulation environment will consist of a circular single-lane highway where vehicles cannot change lanes or overtake, similar to the experimental setup in  @sugiyama2008.
+The simulation environment will consist of a circular single-lane highway where vehicles cannot change lanes or overtake, similar to the experimental setup in @sugiyama2008.
 
 The environment will be discretized into cells, with vehicles occupying each one cell. Time will progress in discrete steps. The state of the environment at any time step includes the positions, velocities, and accelerations of all vehicles.
 
@@ -71,19 +81,19 @@ The simulation will also include a mechanism for introducing perturbations (e.g.
 
 The system will consist of two types of agents:
 
-1. *Human-driven vehicle agents*: 
+1. *Human-driven vehicle agents*:
 These agents will follow realistic human driving behaviors including delayed reaction times, unnecessary braking, and suboptimal following distances. Their Implementation will follow a car-following model based on the Intelligent Driver Model (IDM) @treiber2000, which captures realistic human driving behavior including:
-   - Finite reaction times
-   - Imperfect perception
-   - Tendency to maintain safe distances that grow with speed
-   - Some degree of randomness in behavior
+- Finite reaction times
+- Imperfect perception
+- Tendency to maintain safe distances that grow with speed
+- Some degree of randomness in behavior
 
 2. *Autonomous/connected vehicle agents*:
 
 These agents will implement optimal driving strategies with perfect sensing of nearby vehicles and minimal reaction times. Multiple decision-making approaches will be implemented for these agents such as:
-   - Rule-based: Simple rules for maintaining safe distances and speeds such as bilateral control (maintaining equal distance to front and rear vehicles) and wave-dampening (actively counteracting detected traffic waves)
-   - Collaborative sensing: Sharing information about traffic conditions ahead
-   - Reinforcement Learning: Learning optimal policies through trial and error in simulated environments
+- Rule-based: Simple rules for maintaining safe distances and speeds such as bilateral control (maintaining equal distance to front and rear vehicles) and wave-dampening (actively counteracting detected traffic waves)
+- Collaborative sensing: Sharing information about traffic conditions ahead
+- Reinforcement Learning: Learning optimal policies through trial and error in simulated environments
 
 This approaches might change the further we go into the project and course.
 
