@@ -57,9 +57,9 @@ The viral video "The Simple Solution to Traffic" [1] demonstrates how human driv
 Phantom traffic jams—stop-and-go waves that arise on busy roads without obstacles—are caused by drivers' delayed reactions and uneven braking/acceleration. These jams waste time and fuel, increase pollution, and raise crash risks. While adding lanes might help, autonomous vehicles (AVs), as shown in the video @cgpgrey2017traffic, have greater potential to improve safety and efficiency. By using precise control and coordinated driving algorithms, AVs can smooth traffic flow and reduce these unnecessary costs.
 
 == Related Work
-Traffic flow dynamics have been extensively studied in transportation engineering. In the same light, although not as extensively studied, there are still a considerable number of studies related to how AVs could help traffic flow. Some of these studies, like "Traffic Flow Dynamics: Data, Models and Simulation" @Treiber2013, "Opportunities for multiagent systems and multiagent reinforcement learning in traffic control" @Bazzan2009 and "How Autonomous and Human-Driven Vehicles interact in a Roundabout" @laura2023 provide valuable insights into the potential of AVs to improve traffic efficiency and stability.
+Traffic flow dynamics have been extensively studied in transportation engineering. In the same light, although not as extensively studied, there are still a considerable number of studies related to how AVs could help traffic flow. Some of these studies, like "Traffic Flow Dynamics: Data, Models and Simulation" @Treiber2013, "Opportunities for multiagent systems and multiagent reinforcement learning in traffic control" @Bazzan2009 and "How Autonomous   and Human-Driven Vehicles interact in a Roundabout" @laura2023 provide valuable insights into the potential of AVs to improve traffic efficiency and stability.
 
-However, most of these studies focus on specific scenarios or vehicle types, leaving a gap in understanding how AVs can be integrated into existing traffic systems. The work "The impact of connected and autonomous vehicles on traffic flow stability" @sugiyama2008 provides a comprehensive overview of the potential benefits of AVs in traffic flow dynamics, but it does not explore the effects of varying penetration rates or cooperative behaviors.
+The work "The impact of connected and autonomous vehicles on traffic flow stability" @sugiyama2008 provides a comprehensive overview of the potential benefits of AVs in traffic flow dynamics, but it does not explore the effects of varying penetration rates or cooperative behaviors.
 
 == Problem definition and relevance
 With this project we pretend to addresses the following problem: How do varying percentages of autonomous vehicles with different cooperative behaviors impact traffic flow stability and throughput in a circular single-lane highway?
@@ -91,14 +91,14 @@ The simulation will also include a mechanism for introducing perturbations (e.g.
 
 The system will consist of two types of agents:
 
-1. *Human-driven vehicle agents*:
+1. *Human-driven vehicle (HDVs) agents*:
 These agents will follow realistic human driving behaviors including delayed reaction times, unnecessary braking, and suboptimal following distances. Their Implementation will follow a car-following model based on the Intelligent Driver Model (IDM) @treiber2000, which captures realistic human driving behavior including:
 - Finite reaction times
 - Imperfect perception
 - Tendency to maintain safe distances that grow with speed
 - Some degree of randomness in behavior
 
-2. *Autonomous/connected vehicle agents*:
+2. *Autonomous/connected vehicle (AV) agents*:
 
 These agents will implement optimal driving strategies with perfect sensing of nearby vehicles and minimal reaction times. Multiple decision-making approaches will be implemented for these agents such as:
 - Rule-based: Simple rules for maintaining safe distances and speeds such as bilateral control (maintaining equal distance to front and rear vehicles) and wave-dampening (actively counteracting detected traffic waves)
