@@ -141,8 +141,11 @@ The following metrics will be used to evaluate the system's performance:
   - *Wave Formation Time*: How quickly traffic waves form after an initial perturbation
   - *Wave Dissipation Time*: How quickly traffic waves dissipate after formation
 
-= Conclusion
-In this project, we present multi-agent framework to study the impact of autonomous vehicles in a circular single-lane highway. By combining human-driven vehicle models based on the Intelligent Driver Model (IDM) with various autonomous driving strategies, we aim to dissect how different AV behaviors and penetration rates influence system-level traffic dynamics. Our empirical evaluation, guided by metrics such as traffic flow rate, average speed, speed variance, and wave dissipation times, will quantify the thresholds at which AVs significantly mitigate phantom jams and enhance throughput. The insights gained from this work will inform what is the best traffic management strategies in mixed-traffic environments. Ultimately, our findings will most likely show how AVs contribute to safer and more effiecient road networks.
+== Experimental Design
+The experiments will be designed to systematically vary the penetration rates of AVs (0%, 25%, 50%, 75%, and 100%) and the decision-making strategies employed by AVs. Each combination will be run multiple times to account for stochastic variations in traffic flow.
+
+== Expected Outcomes
+We expect to identify critical thresholds in AV penetration rates where significant improvements in traffic flow occur. We also anticipate that cooperative AV strategies will outperform purely reactive ones, particularly at lower penetration rates. The project will quantify the relationship between local AV behaviors and global traffic patterns, contributing to our understanding of how autonomous vehicles can mitigate phantom traffic jams.
 
 #bibliography(
   "refs.bib",
