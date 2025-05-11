@@ -125,13 +125,14 @@ The multi-agent approach is particularly suitable for this problem because:
 == Metrics
 The following metrics will be used to evaluate the system's performance:
 
-+Traffic Flow Rate: The number of vehicles passing a fixed point per unit time
-+Average Vehicle Speed: The mean speed across all vehicles
-+Speed Variance: The variance in speeds across vehicles (indicating stability)
-+Wave Formation Time: How quickly traffic waves form after an initial perturbation
-+Wave Dissipation Time: How quickly traffic waves dissipate after formation
++*Traffic Flow Rate*: The number of vehicles passing a fixed point per unit time
++*Average Vehicle Speed*: The mean speed across all vehicles
++*Speed Variance*: The variance in speeds across vehicles (indicating stability)
++*Wave Formation Time*: How quickly traffic waves form after an initial perturbation
++*Wave Dissipation Time*: How quickly traffic waves dissipate after formation
 
 = Conclusion
+In this project, we present multi-agent framework to study the impact of autonomous vehicles in a circular single-lane highway. By combining human-driven vehicle models based on the Intelligent Driver Model (IDM) with various autonomous driving strategies, we aim to dissect how different AV behaviors and penetration rates influence system-level traffic dynamics. Our empirical evaluation, guided by metrics such as traffic flow rate, average speed, speed variance, and wave dissipation times, will quantify the thresholds at which AVs significantly mitigate phantom jams and enhance throughput. The insights gained from this work will inform what is the best traffic management strategies in mixed-traffic environments. Ultimately, our findings will most likely show how AVs contribute to safer and more effiecient road networks.
 
 #bibliography(
   "refs.bib",
