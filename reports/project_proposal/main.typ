@@ -52,7 +52,7 @@ This project proposal outlines a multi-agent simulation framework to study the i
 
 == Motivation
 Traffic congestion is a persistent problem in urban environments, costing billions in lost productivity and fuel wastage while increasing pollution.
-The viral video "The Simple Solution to Traffic" [1] demonstrates how human driving behaviors, specifically unnecessary braking and acceleration patterns, create "phantom traffic jams" that propagate backward through a line of vehicles.
+The viral video "The Simple Solution to Traffic" [1] demonstrates how human driving behaviors create "phantom traffic jams" that propagate backward through a line of vehicles.
 
 Phantom traffic jams—stop-and-go waves that arise on busy roads without obstacles—are caused by drivers' delayed reactions and uneven braking/acceleration. These jams waste time and fuel, increase pollution, and raise crash risks. While adding lanes might help, autonomous vehicles (AVs), as shown in the video @cgpgrey2017traffic, have greater potential to improve safety and efficiency. By using precise control and coordinated driving algorithms, AVs can smooth traffic flow and reduce these unnecessary costs.
 
