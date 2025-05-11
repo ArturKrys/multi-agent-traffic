@@ -3,23 +3,26 @@
 #let cuhk = super(sym.suit.spade)
 
 #let title = [
-  Multi-Agent System for Phantom Traffic Jam Mitigation
+Autonomous Vehicles in Circular Highway Traffic System: A Multi-Agent Approach to Traffic Flow Optimization
 ]
 #let authors = (
   (
     name: "Artur Krystopchuk",
     email: "email2@email.com",
     mark: super(sym.suit.diamond),
+    istid: "istXXXXXX"
   ),
   (
     name: "Tiago Caixinha",
     email: "email1@email.com",
     mark: super(sym.suit.diamond),
+    istid: "istXXXXXX"
   ),
   (
     name: "Tiago Vieira da Silva",
     email: "tiagovsilva@tecnico.ulisboa.pt",
     mark: super(sym.suit.diamond),
+    istid: "ist199335"
   ),
 )
 #let affiliations = (
@@ -27,7 +30,8 @@
     name: "Instituto Superior Técnico",
     mark: cuhk,
     department: "Departmento de Engenharia Informática",
-    course: "Agentes Autónomos e Sistemas Multi-Agentes"
+    course: "Agentes Autónomos e Sistemas Multi-Agentes",
+    year: "2024/2025",
   ),
 )
 
