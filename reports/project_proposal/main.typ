@@ -14,9 +14,9 @@
   ),
   (
     name: "Tiago Caixinha",
-    email: "email1@email.com",
+    email: "tiago.caixinha@tecnico.ulisboa.pt",
     mark: super(sym.suit.diamond),
-    istid: "istXXXXXX",
+    istid: "ist1102437",
   ),
   (
     name: "Tiago Vieira da Silva",
