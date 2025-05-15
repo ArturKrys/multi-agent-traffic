@@ -7,3 +7,9 @@ devenv.local.nix
 
 # pre-commit
 .pre-commit-config.yaml
+
+# venv
+.venv
+
+# pycache
+__pycache__
