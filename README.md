@@ -74,7 +74,7 @@ This will start a visualization showing:
 ## Project Structure
 
 ```
-src/
+simulation/
 ├── __init__.py
 ├── environment.py      # Main simulation environment
 ├── visualization.py    # Visualization tools
