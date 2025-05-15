@@ -19,13 +19,14 @@ class HighwayVisualizer:
         self.speed_texts = []  # Clear text objects list
         
         # Draw the single-lane circular highway
-        radius = 150  # Base radius
+        radius = self.env.track_length / (2 * np.pi)  # Base radius calculated from track length
         circle = plt.Circle((0, 0), radius, fill=False, color='black')
         self.ax.add_patch(circle)
         
         # Set plot limits and aspects
-        plt.xlim(-200, 200)
-        plt.ylim(-200, 200)
+        limit = radius + 50  # Add some padding
+        plt.xlim(-limit, limit)
+        plt.ylim(-limit, limit)
         self.ax.set_aspect('equal')
         plt.grid(True)
         
@@ -40,6 +41,9 @@ class HighwayVisualizer:
         self.vehicle_patches = []
         self.speed_texts = []
         
+        # Calculate radius once
+        radius = self.env.track_length / (2 * np.pi)
+        
         # Draw each vehicle
         for i in range(self.env.num_vehicles):
             position = state[i*2]
@@ -48,17 +52,22 @@ class HighwayVisualizer:
             # Convert position to angle (in radians)
             angle = (position / self.env.track_length) * 2 * np.pi
             
-            # Calculate vehicle position
-            radius = 150  # Fixed radius for single lane
+            # Calculate vehicle position using the same radius as the track
             x = radius * np.cos(angle)
             y = radius * np.sin(angle)
             
             # Create vehicle patch with different colors for AV and human drivers
             color = 'blue' if i < self.env.num_av else 'red'
+            vehicle_width = 10
+            vehicle_height = 5
+            
+            # Create vehicle patch centered at (x,y)
             vehicle = patches.Rectangle(
-                (x-5, y-2.5), 10, 5,  # Position and size
+                (x - vehicle_width/2, y - vehicle_height/2),  # Center the rectangle
+                vehicle_width, vehicle_height,
                 angle=np.degrees(angle) + 90,  # Angle in degrees
-                color=color,  # Blue for AVs, Red for human drivers
+                rotation_point='center',  # Rotate around center
+                color=color,
                 alpha=0.7
             )
             
