@@ -7,6 +7,7 @@ class HighwayVisualizer:
         self.env = env
         self.fig, self.ax = plt.subplots(figsize=(10, 10))
         self.vehicle_patches = []
+        self.speed_texts = []  # Keep track of text objects
         
         # Setup the visualization
         self.setup_plot()
@@ -15,6 +16,7 @@ class HighwayVisualizer:
         """Initialize the plot with the circular highway."""
         self.ax.clear()
         self.vehicle_patches = []
+        self.speed_texts = []  # Clear text objects list
         
         # Draw the single-lane circular highway
         radius = 150  # Base radius
@@ -29,10 +31,14 @@ class HighwayVisualizer:
         
     def update(self, state):
         """Update the visualization with the current state."""
-        # Remove old vehicle patches
+        # Remove old vehicle patches and text
         for patch in self.vehicle_patches:
             patch.remove()
+        for text in self.speed_texts:
+            text.remove()
+        
         self.vehicle_patches = []
+        self.speed_texts = []
         
         # Draw each vehicle
         for i in range(self.env.num_vehicles):
@@ -60,10 +66,10 @@ class HighwayVisualizer:
             self.vehicle_patches.append(vehicle)
             
             # Add speed indicator text
-            speed_text = f'{speed:.1f}'
-            self.ax.text(x, y, speed_text, fontsize=8, 
-                        horizontalalignment='center', 
-                        verticalalignment='center')
+            speed_text = self.ax.text(x, y, f'{speed:.1f}', fontsize=8,
+                                    horizontalalignment='center',
+                                    verticalalignment='center')
+            self.speed_texts.append(speed_text)
         
         # Update the plot
         self.fig.canvas.draw()
