@@ -63,7 +63,7 @@ export PYTHONPATH="$PYTHONPATH:."  # On Windows, use: set PYTHONPATH=%PYTHONPATH
 To run the example simulation:
 
 ```bash
-python -m circular_highway.example
+python -m simulation.example
 ```
 
 This will start a visualization showing:

@@ -18,6 +18,7 @@ class CircularHighway(gym.Env):
         self.min_speed = 16.67  # Minimum speed in m/s (approximately 60 km/h)
         self.max_acceleration = 3.0  # Maximum acceleration in m/s^2
         self.max_deceleration = -5.0  # Maximum deceleration in m/s^2
+        self.braking_deceleration = -8.0  # Stronger deceleration when braking
         
         # Calculate number of autonomous vehicles
         self.num_av = int(num_vehicles * av_percentage)
@@ -45,8 +46,16 @@ class CircularHighway(gym.Env):
             dtype=np.float32
         )
         
-        # Initialize state
+        # Initialize state and braking state
+        self.braking_vehicles = set()
         self.reset()
+    
+    def set_braking(self, vehicle_index, is_braking):
+        """Set the braking state of a vehicle."""
+        if is_braking:
+            self.braking_vehicles.add(vehicle_index)
+        else:
+            self.braking_vehicles.discard(vehicle_index)
     
     def reset(self, seed=None, options=None):
         """Reset the environment to initial state."""
@@ -62,6 +71,9 @@ class CircularHighway(gym.Env):
             self.state[i*2] = (i * spacing + self.np_random.uniform(-spacing/4, spacing/4)) % self.track_length
             # Random initial speed
             self.state[i*2 + 1] = self.np_random.uniform(self.min_speed, self.max_speed)
+        
+        # Clear braking state
+        self.braking_vehicles.clear()
         
         return self.state, {}
     
@@ -98,7 +110,10 @@ class CircularHighway(gym.Env):
             speed = self.state[i*2 + 1]
             lead_dist, lead_speed = self._get_leading_vehicle(i)
             
-            if i < self.num_av:
+            if i in self.braking_vehicles:
+                # Apply strong braking
+                all_actions[i] = self.braking_deceleration
+            elif i < self.num_av:
                 # Autonomous vehicle - use provided action
                 all_actions[i] = av_actions[i]
             else:
@@ -141,6 +156,8 @@ class CircularHighway(gym.Env):
     
     def _check_collisions(self):
         """Check for collisions between vehicles."""
+        vehicle_width = 10
+        
         for i in range(self.num_vehicles):
             pos_i = self.state[i*2]
             for j in range(i + 1, self.num_vehicles):
@@ -151,6 +168,6 @@ class CircularHighway(gym.Env):
                     abs(pos_i - pos_j + self.track_length),
                     abs(pos_i - pos_j - self.track_length)
                 )
-                if dist < 5:  # Collision threshold (5 meters)
+                if dist < vehicle_width:  # Collision threshold (10 meters)
                     return True
         return False 

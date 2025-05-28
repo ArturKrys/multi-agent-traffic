@@ -1,6 +1,7 @@
 from .environment import CircularHighway
 from .visualization import HighwayVisualizer
 import numpy as np
+import keyboard
 
 def main():
     # Create the environment with 8 vehicles, 50% autonomous
@@ -12,26 +13,37 @@ def main():
     # Reset the environment
     state, _ = env.reset(seed=42)
     
-    # Run simulation for 1000 steps
-    for _ in range(1000):
-        # Random actions for autonomous vehicles
-        av_actions = np.random.uniform(
-            env.max_deceleration,
-            env.max_acceleration,
-            size=env.num_av
-        )
-        
-        # Step the environment (IDM agents will automatically determine their actions)
-        state, rewards, terminated, truncated, _ = env.step(av_actions)
-        
-        # Update visualization
-        vis.update(state)
-        
-        if terminated or truncated:
-            print("Simulation ended due to collision!")
-            break
+    print("Simulation running... Press 'q' to quit")
     
-    vis.close()
+    try:
+        # Run simulation indefinitely
+        while True:
+            # Random actions for autonomous vehicles
+            av_actions = np.random.uniform(
+                env.max_deceleration,
+                env.max_acceleration,
+                size=env.num_av
+            )
+            
+            # Step the environment (IDM agents will automatically determine their actions)
+            state, rewards, terminated, truncated, _ = env.step(av_actions)
+            
+            # Update visualization
+            vis.update(state)
+            
+            if terminated or truncated:
+                print("Collision detected! Closing simulation...")
+                break
+            
+            # Check for quit key
+            if keyboard.is_pressed('q'):
+                print("Simulation stopped by user")
+                break
+                
+    except KeyboardInterrupt:
+        print("\nSimulation stopped by user")
+    finally:
+        vis.close()
 
 if __name__ == "__main__":
     main() 

@@ -10,6 +10,7 @@ devenv.local.nix
 
 # venv
 .venv
+venv
 
 # pycache
 __pycache__
