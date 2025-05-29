@@ -3,9 +3,35 @@ from .visualization import HighwayVisualizer
 import numpy as np
 import keyboard
 
+def get_user_input():
+    """Get user input for simulation parameters."""
+    while True:
+        try:
+            num_vehicles = int(input("Enter the number of vehicles (recommended: 4-12): "))
+            if num_vehicles < 2:
+                print("Please enter at least 2 vehicles.")
+                continue
+            if num_vehicles > 20:
+                print("Warning: Large number of vehicles may affect performance.")
+            
+            av_percentage = float(input("Enter the percentage of autonomous vehicles (0 to 100): "))
+            if not 0 <= av_percentage <= 100:
+                print("Please enter a value between 0 and 100.")
+                continue
+            
+            # Convert percentage to decimal
+            av_percentage = av_percentage / 100
+            
+            return num_vehicles, av_percentage
+        except ValueError:
+            print("Please enter valid numbers.")
+
 def main():
-    # Create the environment with 8 vehicles, 50% autonomous
-    env = CircularHighway(num_vehicles=8, track_length=1000, av_percentage=0.5)
+    # Get user input for simulation parameters
+    num_vehicles, av_percentage = get_user_input()
+    
+    # Create the environment with user-specified parameters
+    env = CircularHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage)
     
     # Create the visualizer
     vis = HighwayVisualizer(env)
@@ -13,7 +39,10 @@ def main():
     # Reset the environment
     state, _ = env.reset(seed=42)
     
-    print("Simulation running... Press 'q' to quit")
+    print("\nSimulation running... Press 'q' to quit")
+    print(f"Total vehicles: {num_vehicles}")
+    print(f"Autonomous vehicles: {int(num_vehicles * av_percentage)}")
+    print(f"Human-driven vehicles: {num_vehicles - int(num_vehicles * av_percentage)}")
     
     try:
         # Run simulation indefinitely
