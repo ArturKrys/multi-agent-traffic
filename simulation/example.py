@@ -39,14 +39,14 @@ def main():
     # Reset the environment
     state, _ = env.reset(seed=42)
     
-    print("\nSimulation running... Press 'q' to quit")
+    print("\nSimulation running...")
     print(f"Total vehicles: {num_vehicles}")
     print(f"Autonomous vehicles: {int(num_vehicles * av_percentage)}")
     print(f"Human-driven vehicles: {num_vehicles - int(num_vehicles * av_percentage)}")
     
     try:
         # Run simulation indefinitely
-        while True:
+        while vis.running:
             # Random actions for autonomous vehicles
             av_actions = np.random.uniform(
                 env.max_deceleration,
@@ -58,15 +58,11 @@ def main():
             state, rewards, terminated, truncated, _ = env.step(av_actions)
             
             # Update visualization
-            vis.update(state)
+            if not vis.update(state):
+                break
             
             if terminated or truncated:
                 print("Collision detected! Closing simulation...")
-                break
-            
-            # Check for quit key
-            if keyboard.is_pressed('q'):
-                print("Simulation stopped by user")
                 break
                 
     except KeyboardInterrupt:
