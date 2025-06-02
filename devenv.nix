@@ -12,6 +12,7 @@
     pkgs.python3Packages.numpy
     pkgs.python3Packages.gymnasium
     pkgs.python3Packages.matplotlib
+    pkgs.python3Packages.keyboard
   ];
 
   # https://devenv.sh/scripts/
