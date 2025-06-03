@@ -1,5 +1,6 @@
 from .environment import CircularHighway
 from .visualization import HighwayVisualizer
+from .agents import AutonomousAgent, ConsensusBasedControlAgent
 import numpy as np
 import keyboard
 
@@ -26,13 +27,44 @@ def get_user_input():
         except ValueError:
             print("Please enter valid numbers.")
 
+def get_agent_type():
+    print("Select AV agent type:")
+    print("1. Random (default)")
+    print("2. Greedy (proportional control)")
+    print("3. Consensus-Based Control")
+    choice = input("Enter choice [1-3]: ").strip()
+    if choice == '3':
+        return 'consensus'
+    elif choice == '2':
+        return 'greedy'
+    else:
+        return 'random'
+
 def main():
     # Get user input for simulation parameters
     num_vehicles, av_percentage = get_user_input()
-    
+    agent_type = get_agent_type()
+
     # Create the environment with user-specified parameters
-    env = CircularHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage)
-    
+    if agent_type == 'consensus':
+        # Use ConsensusBasedControlAgent for all AVs
+        from .environment import CircularHighway
+        from .agents import IDMAgent
+        class ConsensusHighway(CircularHighway):
+            def __init__(self, num_vehicles, track_length, av_percentage):
+                super().__init__(num_vehicles, track_length, av_percentage)
+                self.agents = []
+                for i in range(num_vehicles):
+                    if i < self.num_av:
+                        self.agents.append(ConsensusBasedControlAgent())
+                    else:
+                        self.agents.append(IDMAgent())
+        env = ConsensusHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage)
+        av_agent_name = "Consensus-Based Control"
+    else:
+        env = CircularHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage)
+        av_agent_name = "Random" if agent_type == 'random' else "Greedy (proportional control)"
+
     # Create the visualizer
     vis = HighwayVisualizer(env)
     
@@ -43,19 +75,22 @@ def main():
     print(f"Total vehicles: {num_vehicles}")
     print(f"Autonomous vehicles: {int(num_vehicles * av_percentage)}")
     print(f"Human-driven vehicles: {num_vehicles - int(num_vehicles * av_percentage)}")
+    print(f"AV agent type: {av_agent_name}")
     
     try:
         # Run simulation indefinitely
         while vis.running:
-            # Random actions for autonomous vehicles
-            av_actions = np.random.uniform(
-                env.max_deceleration,
-                env.max_acceleration,
-                size=env.num_av
-            )
-            
-            # Step the environment (IDM agents will automatically determine their actions)
-            state, rewards, terminated, truncated, _ = env.step(av_actions)
+            if agent_type == 'consensus':
+                # No need to provide actions; environment computes them
+                state, rewards, terminated, truncated, _ = env.step()
+            else:
+                # Random or greedy actions for autonomous vehicles
+                av_actions = np.random.uniform(
+                    env.max_deceleration,
+                    env.max_acceleration,
+                    size=env.num_av
+                )
+                state, rewards, terminated, truncated, _ = env.step(av_actions)
             
             # Update visualization
             if not vis.update(state):

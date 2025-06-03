@@ -1,4 +1,4 @@
 from .idm_agent import IDMAgent
-from .autonomous_agent import AutonomousAgent
+from .autonomous_agent import AutonomousAgent, ConsensusBasedControlAgent
 
-__all__ = ['IDMAgent', 'AutonomousAgent'] 
+__all__ = ['IDMAgent', 'AutonomousAgent', 'ConsensusBasedControlAgent'] 

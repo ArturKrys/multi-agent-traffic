@@ -94,30 +94,35 @@ class CircularHighway(gym.Env):
         
         return min_dist, lead_speed
     
-    def step(self, av_actions):
+    def step(self, av_actions=None):
         """
-        Take a step in the environment given the actions of autonomous vehicles.
-        Human-driven vehicles use IDM to determine their actions.
+        Take a step in the environment. If using consensus-based AVs, compute actions internally.
+        Otherwise, use provided av_actions for AVs and IDM for human drivers.
         """
-        # Ensure actions are within bounds
-        av_actions = np.clip(av_actions, self.max_deceleration, self.max_acceleration)
+        # Determine if using consensus-based control
+        use_consensus = self.num_av > 0 and hasattr(self.agents[0], 'get_actions')
         
+        if use_consensus:
+            # Compute AV actions using consensus-based control
+            av_actions = self.agents[0].get_actions(self.state, self.num_av)
+        elif av_actions is not None:
+            # Ensure actions are within bounds
+            av_actions = np.clip(av_actions, self.max_deceleration, self.max_acceleration)
+        else:
+            # Fallback: random actions for AVs if none provided
+            av_actions = np.random.uniform(self.max_deceleration, self.max_acceleration, size=self.num_av)
+
         # Calculate actions for all vehicles
         all_actions = np.zeros(self.num_vehicles)
         
-        # Process each vehicle
         for i in range(self.num_vehicles):
             speed = self.state[i*2 + 1]
             lead_dist, lead_speed = self._get_leading_vehicle(i)
-            
             if i in self.braking_vehicles:
-                # Apply strong braking
                 all_actions[i] = self.braking_deceleration
             elif i < self.num_av:
-                # Autonomous vehicle - use provided action
                 all_actions[i] = av_actions[i]
             else:
-                # Human-driven vehicle - use IDM
                 all_actions[i] = self.agents[i].act(speed, lead_dist, lead_speed)
         
         # Update speeds and positions
