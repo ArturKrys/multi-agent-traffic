@@ -2,13 +2,14 @@ import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
 from .agents import IDMAgent, AutonomousAgent
+from .agent_factory import AgentFactory
 
 class CircularHighway(gym.Env):
     """
     A single-lane circular highway environment for mixed autonomous and human-driven traffic.
     """
     
-    def __init__(self, num_vehicles=8, track_length=1000, av_percentage=0.5):
+    def __init__(self, num_vehicles=8, track_length=1000, av_percentage=0.5, position_type='random', agent_type='random'):
         super().__init__()
         
         # Environment parameters
@@ -24,13 +25,22 @@ class CircularHighway(gym.Env):
         self.num_av = int(num_vehicles * av_percentage)
         self.num_human = num_vehicles - self.num_av
         
-        # Initialize agents
-        self.agents = []
-        for i in range(num_vehicles):
-            if i < self.num_av:
-                self.agents.append(AutonomousAgent())
-            else:
-                self.agents.append(IDMAgent())
+        # Store position type and agent type
+        self.position_type = position_type
+        self.agent_type = agent_type
+        
+        # Initialize agents and state using the factory
+        self.agents, self.av_indices = AgentFactory.create_agents(
+            num_vehicles=num_vehicles,
+            av_percentage=av_percentage,
+            position_type=position_type,
+            agent_type=agent_type
+        )
+        
+        self.state = np.zeros(self.num_vehicles * 2)
+        
+        # Calculate base spacing between vehicles
+        self.spacing = self.track_length / self.num_vehicles
         
         # State space: [position, speed] for each vehicle
         self.observation_space = spaces.Box(
@@ -49,6 +59,9 @@ class CircularHighway(gym.Env):
         # Initialize state and braking state
         self.braking_vehicles = set()
         self.reset()
+        
+        print(self.state)
+        print(self.agents)
     
     def set_braking(self, vehicle_index, is_braking):
         """Set the braking state of a vehicle."""
@@ -61,21 +74,65 @@ class CircularHighway(gym.Env):
         """Reset the environment to initial state."""
         super().reset(seed=seed)
         
-        # Initialize vehicles with random positions and speeds
+        # Initialize positions and speeds of vehicles
         self.state = np.zeros(self.num_vehicles * 2)
         
-        # Distribute vehicles roughly evenly around the track
-        spacing = self.track_length / self.num_vehicles
-        for i in range(self.num_vehicles):
-            # Position with some random offset
-            self.state[i*2] = (i * spacing + self.np_random.uniform(-spacing/4, spacing/4)) % self.track_length
-            # Random initial speed
-            self.state[i*2 + 1] = self.np_random.uniform(self.min_speed, self.max_speed)
+        if self.position_type == 'interleaved':
+            self._reset_interleaved()
+        elif self.position_type == 'grouped':
+            self._reset_grouped()
+        else:  # random
+            self._reset_random()
         
         # Clear braking state
         self.braking_vehicles.clear()
         
         return self.state, {}
+    
+    def _reset_interleaved(self):
+        """Reset vehicle positions in an alternating pattern."""
+        av_count = 0
+        human_count = 0
+        for i in range(self.num_vehicles):
+            if i in self.av_indices:
+                # Position AVs in even positions
+                self.state[i*2] = (av_count * 2 * self.spacing) % self.track_length
+                av_count += 1
+            else:
+                # Position human vehicles in odd positions
+                self.state[i*2] = ((human_count * 2 + 1) * self.spacing) % self.track_length
+                human_count += 1
+            self.state[i*2 + 1] = 0  # initial speed
+    
+    def _reset_grouped(self):
+        """Reset vehicle positions in groups (AVs together, then humans)."""
+        # Calculate spacing for each group
+        av_spacing = (self.track_length / 2) / self.num_av if self.num_av > 0 else 0
+        human_spacing = (self.track_length / 2) / self.num_human if self.num_human > 0 else 0
+        
+        # First, position all AVs in the first half of the track
+        av_count = 0
+        for i in range(self.num_vehicles):
+            if i in self.av_indices:
+                # Position AVs in the first half of the track
+                self.state[i*2] = (av_count * av_spacing) % (self.track_length / 2)
+                av_count += 1
+            self.state[i*2 + 1] = 0  # initial speed
+        
+        # Then, position all human vehicles in the second half of the track
+        human_count = 0
+        for i in range(self.num_vehicles):
+            if i not in self.av_indices:
+                # Position humans in the second half of the track
+                self.state[i*2] = (self.track_length / 2 + human_count * human_spacing) % self.track_length
+                human_count += 1
+    
+    def _reset_random(self):
+        """Reset vehicle positions randomly."""
+        positions = np.random.permutation(self.num_vehicles)
+        for i in range(self.num_vehicles):
+            self.state[i*2] = (positions[i] * self.spacing) % self.track_length
+            self.state[i*2 + 1] = 0  # initial speed
     
     def _get_leading_vehicle(self, index):
         """Get distance and speed of the leading vehicle."""
@@ -114,14 +171,17 @@ class CircularHighway(gym.Env):
 
         # Calculate actions for all vehicles
         all_actions = np.zeros(self.num_vehicles)
+        av_count = 0  # Counter for AV actions
         
         for i in range(self.num_vehicles):
             speed = self.state[i*2 + 1]
             lead_dist, lead_speed = self._get_leading_vehicle(i)
+            
             if i in self.braking_vehicles:
                 all_actions[i] = self.braking_deceleration
-            elif i < self.num_av:
-                all_actions[i] = av_actions[i]
+            elif i in self.av_indices:
+                all_actions[i] = av_actions[av_count]
+                av_count += 1
             else:
                 all_actions[i] = self.agents[i].act(speed, lead_dist, lead_speed)
         
