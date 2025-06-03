@@ -84,3 +84,113 @@ class ConsensusBasedControlAgent(AutonomousAgent):
                 acc = consensus_term + recovery_term
                 actions[i] = np.clip(acc, self.max_deceleration, self.max_acceleration)
         return actions 
+
+class MiddleDistanceRuleAgent(AutonomousAgent):
+    """
+    Rule‐based agent that tries to stay in the middle between the car in front and behind.
+    - Dynamically computes braking_distance = v^2 / (2 * |max_deceleration|) each timestep.
+    - If front_gap < braking_distance, apply max_deceleration (hard brake).
+    - If front_gap > 2 * braking_distance, just target desired_speed.
+    - Otherwise, use a proportional “middle‐distance” law.
+    """
+
+    def __init__(
+        self,
+        desired_speed=30.0,
+        max_acceleration=2.0,
+        max_deceleration=-5.0,
+        track_length=1000
+    ):
+        super().__init__(desired_speed)
+        self.max_acceleration = max_acceleration
+        self.max_deceleration = max_deceleration  # negative number, e.g. -5.0
+        self.track_length = track_length
+
+    @staticmethod
+    def _circular_distance(pos1, pos2, track_length):
+        """Compute forward distance from pos1 to pos2 on a circular track."""
+        return (pos2 - pos1) % track_length
+
+    def get_actions(self, state, num_av):
+        """
+        For each AV (indices 0..num_av-1), compute its acceleration based on dynamic
+        braking distance and middle-distance rule.
+
+        Args:
+            state: [pos0, speed0, pos1, speed1, …, posN, speedN]
+            num_av: number of AVs (assumed to occupy indices 0..num_av-1)
+
+        Returns:
+            actions: np.ndarray of length num_av, containing one accel for each AV.
+        """
+        num_vehicles = len(state) // 2
+        positions = [state[2*i] for i in range(num_vehicles)]
+        speeds    = [state[2*i+1] for i in range(num_vehicles)]
+        actions = np.zeros(num_av)
+
+        for i in range(num_av):
+            my_pos   = positions[i]
+            my_speed = speeds[i]
+
+            # 1) Compute dynamic braking distance for this AV:
+            #    d_b = v^2 / (2 * |a_max|)
+            a_max = abs(self.max_deceleration)
+            
+            braking_dist = (my_speed**2) / (2.0 * a_max)
+
+            # 2) Find nearest front_gap and back_gap (circular)
+            min_front_gap = float('inf')
+            min_back_gap  = float('inf')
+            front_idx = None
+            back_idx  = None
+
+            for j in range(num_vehicles):
+                if j == i:
+                    continue
+                gap_forward = (positions[j] - my_pos) % self.track_length
+                if 0 < gap_forward < min_front_gap:
+                    min_front_gap = gap_forward
+                    front_idx = j
+
+                gap_backward = (my_pos - positions[j]) % self.track_length
+                if 0 < gap_backward < min_back_gap:
+                    min_back_gap = gap_backward
+                    back_idx = j
+
+            # 3) SAFETY BRAKE if too close to front
+            if front_idx is not None and min_front_gap < braking_dist:
+                # apply hardest braking immediately
+                acc = self.max_deceleration
+
+            else:
+                # 4) If front is "very far" (> 2 * braking_dist), just recover to desired speed
+                if front_idx is not None and min_front_gap > 2.0 * braking_dist:
+                    # simple P‐control on speed
+                    gain_speed = 1.5
+                    acc = gain_speed * (self.desired_speed - my_speed)
+
+                else:
+                    # 5) Otherwise, use “stay-in-the-middle” between front & back
+                    #    If no front_idx (e.g. single vehicle), treat front_gap as very large:
+                    front_gap = min_front_gap if front_idx is not None else (2.0 * braking_dist)
+                    #    If no back_idx, treat back_gap = front_gap (so target_distance = front_gap)
+                    back_gap  = min_back_gap  if back_idx  is not None else front_gap
+
+                    target_dist = 0.5 * (front_gap + back_gap)
+                    dist_error  = target_dist - back_gap
+
+                    # P‐controller on distance + P on speed difference
+                    k_p_dist  = 0.1
+                    k_p_speed = 0.3
+                    acc = k_p_dist  * dist_error \
+                        + k_p_speed * (self.desired_speed - my_speed)
+
+            # 6) Clip to [max_deceleration, max_acceleration]
+            if acc > self.max_acceleration:
+                acc = self.max_acceleration
+            if acc < self.max_deceleration:
+                acc = self.max_deceleration
+
+            actions[i] = acc
+
+        return actions

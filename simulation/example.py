@@ -1,6 +1,6 @@
 from .environment import CircularHighway
 from .visualization import HighwayVisualizer
-from .agents import AutonomousAgent, ConsensusBasedControlAgent
+from .agents import AutonomousAgent, ConsensusBasedControlAgent, MiddleDistanceRuleAgent
 import numpy as np
 import keyboard
 
@@ -32,8 +32,11 @@ def get_agent_type():
     print("1. Random (default)")
     print("2. Greedy (proportional control)")
     print("3. Consensus-Based Control")
-    choice = input("Enter choice [1-3]: ").strip()
-    if choice == '3':
+    print("4. In-the-middle Rule Control")
+    choice = input("Enter choice [1-4]: ").strip()
+    if choice == '4':
+        return 'in_the_middle'
+    elif choice == '3':
         return 'consensus'
     elif choice == '2':
         return 'greedy'
@@ -46,21 +49,23 @@ def main():
     agent_type = get_agent_type()
 
     # Create the environment with user-specified parameters
-    if agent_type == 'consensus':
-        # Use ConsensusBasedControlAgent for all AVs
+    if agent_type == 'consensus' or agent_type == 'in_the_middle':
         from .environment import CircularHighway
         from .agents import IDMAgent
-        class ConsensusHighway(CircularHighway):
+        class IntelligentHighway(CircularHighway):
             def __init__(self, num_vehicles, track_length, av_percentage):
                 super().__init__(num_vehicles, track_length, av_percentage)
                 self.agents = []
                 for i in range(num_vehicles):
                     if i < self.num_av:
-                        self.agents.append(ConsensusBasedControlAgent())
+                        if agent_type == 'consensus':
+                            self.agents.append(ConsensusBasedControlAgent())
+                        else:
+                            self.agents.append(MiddleDistanceRuleAgent())
                     else:
                         self.agents.append(IDMAgent())
-        env = ConsensusHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage)
-        av_agent_name = "Consensus-Based Control"
+        env = IntelligentHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage)
+        av_agent_name = "Consensus-Based Control" if agent_type == 'consensus' else "In-the-middle Rule Control"
     else:
         env = CircularHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage)
         av_agent_name = "Random" if agent_type == 'random' else "Greedy (proportional control)"
@@ -80,7 +85,7 @@ def main():
     try:
         # Run simulation indefinitely
         while vis.running:
-            if agent_type == 'consensus':
+            if agent_type == 'consensus' or agent_type == 'in_the_middle':
                 # No need to provide actions; environment computes them
                 state, rewards, terminated, truncated, _ = env.step()
             else:

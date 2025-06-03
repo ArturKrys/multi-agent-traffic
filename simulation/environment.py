@@ -100,9 +100,9 @@ class CircularHighway(gym.Env):
         Otherwise, use provided av_actions for AVs and IDM for human drivers.
         """
         # Determine if using consensus-based control
-        use_consensus = self.num_av > 0 and hasattr(self.agents[0], 'get_actions')
-        
-        if use_consensus:
+        use_av_Intelligence = self.num_av > 0 and hasattr(self.agents[0], 'get_actions')
+
+        if use_av_Intelligence:
             # Compute AV actions using consensus-based control
             av_actions = self.agents[0].get_actions(self.state, self.num_av)
         elif av_actions is not None:
