@@ -2,14 +2,13 @@ import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
 from .agents import IDMAgent, AutonomousAgent
-from .agent_factory import AgentFactory
 
 class CircularHighway(gym.Env):
     """
     A single-lane circular highway environment for mixed autonomous and human-driven traffic.
     """
     
-    def __init__(self, num_vehicles=8, track_length=1000, av_percentage=0.5, position_type='random', agent_type='random'):
+    def __init__(self, num_vehicles=8, track_length=1000, av_percentage=0.5, position_type='random'):
         super().__init__()
         
         # Environment parameters
@@ -25,22 +24,18 @@ class CircularHighway(gym.Env):
         self.num_av = int(num_vehicles * av_percentage)
         self.num_human = num_vehicles - self.num_av
         
-        # Store position type and agent type
+        # Store position type
         self.position_type = position_type
-        self.agent_type = agent_type
         
-        # Initialize agents and state using the factory
-        self.agents, self.av_indices = AgentFactory.create_agents(
-            num_vehicles=num_vehicles,
-            av_percentage=av_percentage,
-            position_type=position_type,
-            agent_type=agent_type
-        )
-        
+        # Initialize agents and state
+        self.agents = []
         self.state = np.zeros(self.num_vehicles * 2)
         
         # Calculate base spacing between vehicles
         self.spacing = self.track_length / self.num_vehicles
+        
+        # Initialize agents based on type
+        self._initialize_agents()
         
         # State space: [position, speed] for each vehicle
         self.observation_space = spaces.Box(
@@ -59,9 +54,51 @@ class CircularHighway(gym.Env):
         # Initialize state and braking state
         self.braking_vehicles = set()
         self.reset()
+    
+    def _initialize_agents(self):
+        """Initialize agents based on position type."""
+        self.agents = []
+        self.av_indices = set()
         
-        print(self.state)
-        print(self.agents)
+        if self.position_type == 'interleaved':
+            self._initialize_interleaved()
+        elif self.position_type == 'grouped':
+            self._initialize_grouped()
+        else:  # random
+            self._initialize_random()
+    
+    def _initialize_interleaved(self):
+        """Initialize agents in an alternating pattern with equal spacing between AVs."""
+        # First, create all AVs
+        for i in range(self.num_av):
+            self.agents.append(AutonomousAgent())
+            self.av_indices.add(i)
+        
+        # Then create all IDMs
+        for i in range(self.num_human):
+            self.agents.append(IDMAgent())
+    
+    def _initialize_grouped(self):
+        """Initialize agents in groups (all AVs together, then all humans)."""
+        # First, create all AVs
+        for i in range(self.num_av):
+            self.agents.append(AutonomousAgent())
+            self.av_indices.add(i)
+        
+        # Then create all IDMs
+        for i in range(self.num_human):
+            self.agents.append(IDMAgent())
+    
+    def _initialize_random(self):
+        """Initialize agents in random positions."""
+        # First, create all AVs
+        for i in range(self.num_av):
+            self.agents.append(AutonomousAgent())
+            self.av_indices.add(i)
+        
+        # Then create all IDMs
+        for i in range(self.num_human):
+            self.agents.append(IDMAgent())
     
     def set_braking(self, vehicle_index, is_braking):
         """Set the braking state of a vehicle."""
@@ -90,19 +127,42 @@ class CircularHighway(gym.Env):
         return self.state, {}
     
     def _reset_interleaved(self):
-        """Reset vehicle positions in an alternating pattern."""
+        """Reset vehicle positions with equal spacing and proper alternation."""
+        # Calculate the ratio of vehicles
+        if self.num_av > self.num_human:
+            # More AVs than IDMs
+            ratio = self.num_av / self.num_human
+            vehicles_per_group = int(ratio)
+            sequence = ['AV'] * vehicles_per_group + ['IDM']
+        else:
+            # More IDMs than AVs or equal
+            ratio = self.num_human / self.num_av
+            vehicles_per_group = int(ratio)
+            sequence = ['AV'] + ['IDM'] * vehicles_per_group
+
+        # Create the full sequence of vehicle types
+        full_sequence = []
+        while len(full_sequence) < self.num_vehicles:
+            full_sequence.extend(sequence)
+        full_sequence = full_sequence[:self.num_vehicles]
+
+        # Calculate base spacing
+        spacing = self.track_length / self.num_vehicles
+
+        # Assign positions to vehicles
         av_count = 0
-        human_count = 0
-        for i in range(self.num_vehicles):
-            if i in self.av_indices:
-                # Position AVs in even positions
-                self.state[i*2] = (av_count * 2 * self.spacing) % self.track_length
+        idm_count = 0
+        for i, vehicle_type in enumerate(full_sequence):
+            if vehicle_type == 'AV':
+                # Assign position to AV
+                self.state[av_count*2] = (i * spacing) % self.track_length
+                self.state[av_count*2 + 1] = 0  # initial speed
                 av_count += 1
             else:
-                # Position human vehicles in odd positions
-                self.state[i*2] = ((human_count * 2 + 1) * self.spacing) % self.track_length
-                human_count += 1
-            self.state[i*2 + 1] = 0  # initial speed
+                # Assign position to IDM
+                self.state[(self.num_av + idm_count)*2] = (i * spacing) % self.track_length
+                self.state[(self.num_av + idm_count)*2 + 1] = 0  # initial speed
+                idm_count += 1
     
     def _reset_grouped(self):
         """Reset vehicle positions in groups (AVs together, then humans)."""
@@ -128,10 +188,18 @@ class CircularHighway(gym.Env):
                 human_count += 1
     
     def _reset_random(self):
-        """Reset vehicle positions randomly."""
+        """Reset vehicle positions randomly while maintaining equal spacing."""
+        # Generate random positions for all vehicles
         positions = np.random.permutation(self.num_vehicles)
+        
+        # Calculate base spacing
+        spacing = self.track_length / self.num_vehicles
+        
+        # Assign positions to vehicles
         for i in range(self.num_vehicles):
-            self.state[i*2] = (positions[i] * self.spacing) % self.track_length
+            # Use the random position to determine where to place the vehicle
+            # while maintaining equal spacing between all vehicles
+            self.state[i*2] = (positions[i] * spacing) % self.track_length
             self.state[i*2 + 1] = 0  # initial speed
     
     def _get_leading_vehicle(self, index):

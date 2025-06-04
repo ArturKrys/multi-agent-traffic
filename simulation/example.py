@@ -1,7 +1,6 @@
 from .environment import CircularHighway
 from .visualization import HighwayVisualizer
 from .agents import AutonomousAgent, ConsensusBasedControlAgent
-from .agent_factory import AgentFactory
 import numpy as np
 import keyboard
 
@@ -45,16 +44,16 @@ def get_user_input():
         print("Please enter a valid choice (1, 2, or 3).")
     
     # Get agent type
-    available_agents = AgentFactory.get_available_agent_types()
     while True:
         print("\nSelect AV agent type:")
-        for i, agent_type in enumerate(available_agents, 1):
-            print(f"{i}. {agent_type.capitalize()}")
-        agent_choice = input(f"Enter choice [1-{len(available_agents)}]: ").strip()
-        if agent_choice.isdigit() and 1 <= int(agent_choice) <= len(available_agents):
-            agent_type = available_agents[int(agent_choice) - 1]
+        print("1. Random (default)")
+        print("2. Greedy (proportional control)")
+        print("3. Consensus-Based Control")
+        agent_choice = input("Enter choice [1-3]: ").strip()
+        if agent_choice in ['1', '2', '3']:
+            agent_type = 'random' if agent_choice == '1' else 'greedy' if agent_choice == '2' else 'consensus'
             break
-        print(f"Please enter a valid choice (1-{len(available_agents)}).")
+        print("Please enter a valid choice (1, 2, or 3).")
     
     return num_vehicles, av_percentage, position_type, agent_type
 
@@ -63,13 +62,26 @@ def main():
     num_vehicles, av_percentage, position_type, agent_type = get_user_input()
 
     # Create the environment with user-specified parameters
-    env = CircularHighway(
-        num_vehicles=num_vehicles,
-        track_length=1000,
-        av_percentage=av_percentage,
-        position_type=position_type,
-        agent_type=agent_type
-    )
+    if agent_type == 'consensus':
+        # Use ConsensusBasedControlAgent for all AVs
+        from .environment import CircularHighway
+        from .agents import IDMAgent
+        class ConsensusHighway(CircularHighway):
+            def __init__(self, num_vehicles, track_length, av_percentage, position_type):
+                super().__init__(num_vehicles, track_length, av_percentage, position_type)
+                self.agents = []
+                self.av_indices = set()  # Initialize av_indices set
+                for i in range(num_vehicles):
+                    if i < self.num_av:
+                        self.agents.append(ConsensusBasedControlAgent())
+                        self.av_indices.add(i)  # Add index to av_indices
+                    else:
+                        self.agents.append(IDMAgent())
+        env = ConsensusHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage, position_type=position_type)
+        av_agent_name = "Consensus-Based Control"
+    else:
+        env = CircularHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage, position_type=position_type)
+        av_agent_name = "Random" if agent_type == 'random' else "Greedy (proportional control)"
 
     # Create the visualizer
     vis = HighwayVisualizer(env)
@@ -81,7 +93,7 @@ def main():
     print(f"Total vehicles: {num_vehicles}")
     print(f"Autonomous vehicles: {int(num_vehicles * av_percentage)}")
     print(f"Human-driven vehicles: {num_vehicles - int(num_vehicles * av_percentage)}")
-    print(f"AV agent type: {agent_type.capitalize()}")
+    print(f"AV agent type: {av_agent_name}")
     
     try:
         # Run simulation indefinitely
