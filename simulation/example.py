@@ -27,8 +27,43 @@ def get_user_input():
         except ValueError:
             print("Please enter valid numbers.")
 
+def get_braking_parameters():
+    """Get user input for controlled braking parameters."""
+    print("\nControlled Braking Configuration:")
+    use_controlled_braking = input("Enable controlled braking? (y/N): ").lower().startswith('y')
+    
+    if not use_controlled_braking:
+        return False, 10, 50, -3.0, None
+    
+    while True:
+        try:
+            brake_every_x_loops = int(input("Brake every X loops through measurement point (default 3): ") or "3")
+            if brake_every_x_loops < 1:
+                print("Please enter a positive number.")
+                continue
+                
+            brake_duration = int(input("Brake duration in time steps (default 50, 1 step = 0.1s): ") or "50")
+            if brake_duration < 1:
+                print("Please enter a positive number.")
+                continue
+                
+            brake_acceleration = float(input("Brake acceleration in m/s² (negative value, default -6.0): ") or "-6.0")
+            if brake_acceleration > 0:
+                print("Brake acceleration should be negative.")
+                continue
+                
+            agent_choice = input("Which agent should brake? (enter agent number or leave empty for first human driver): ").strip()
+            braking_agent_index = None
+            if agent_choice:
+                braking_agent_index = int(agent_choice)
+                
+            return True, brake_every_x_loops, brake_duration, brake_acceleration, braking_agent_index
+            
+        except ValueError:
+            print("Please enter valid numbers.")
+
 def get_agent_type():
-    print("Select AV agent type:")
+    print("\nSelect AV agent type:")
     print("1. Random (default)")
     print("2. Greedy (proportional control)")
     print("3. Consensus-Based Control")
@@ -47,14 +82,18 @@ def main():
     # Get user input for simulation parameters
     num_vehicles, av_percentage = get_user_input()
     agent_type = get_agent_type()
+    controlled_braking, brake_every_x_loops, brake_duration, brake_acceleration, braking_agent_index = get_braking_parameters()
 
     # Create the environment with user-specified parameters
     if agent_type == 'consensus' or agent_type == 'in_the_middle':
         from .environment import CircularHighway
         from .agents import IDMAgent
         class IntelligentHighway(CircularHighway):
-            def __init__(self, num_vehicles, track_length, av_percentage):
-                super().__init__(num_vehicles, track_length, av_percentage)
+            def __init__(self, num_vehicles, track_length, av_percentage, controlled_braking=False, 
+                        brake_every_x_loops=10, brake_duration=50, brake_acceleration=-3.0, 
+                        braking_agent_index=None):
+                super().__init__(num_vehicles, track_length, av_percentage, controlled_braking, 
+                               brake_every_x_loops, brake_duration, brake_acceleration, braking_agent_index)
                 self.agents = []
                 for i in range(num_vehicles):
                     if i < self.num_av:
@@ -64,10 +103,16 @@ def main():
                             self.agents.append(MiddleDistanceRuleAgent())
                     else:
                         self.agents.append(IDMAgent())
-        env = IntelligentHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage)
+        env = IntelligentHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage,
+                               controlled_braking=controlled_braking, brake_every_x_loops=brake_every_x_loops,
+                               brake_duration=brake_duration, brake_acceleration=brake_acceleration,
+                               braking_agent_index=braking_agent_index)
         av_agent_name = "Consensus-Based Control" if agent_type == 'consensus' else "In-the-middle Rule Control"
     else:
-        env = CircularHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage)
+        env = CircularHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage,
+                            controlled_braking=controlled_braking, brake_every_x_loops=brake_every_x_loops,
+                            brake_duration=brake_duration, brake_acceleration=brake_acceleration,
+                            braking_agent_index=braking_agent_index)
         av_agent_name = "Random" if agent_type == 'random' else "Greedy (proportional control)"
 
     # Create the visualizer
@@ -81,6 +126,14 @@ def main():
     print(f"Autonomous vehicles: {int(num_vehicles * av_percentage)}")
     print(f"Human-driven vehicles: {num_vehicles - int(num_vehicles * av_percentage)}")
     print(f"AV agent type: {av_agent_name}")
+    
+    if controlled_braking:
+        braking_status = env.get_braking_status()
+        print(f"\nControlled Braking Enabled:")
+        print(f"  Braking agent: {braking_status['braking_agent']}")
+        print(f"  Brake every {braking_status['brake_every_x_loops']} loops")
+        print(f"  Brake duration: {braking_status['brake_duration']} steps ({braking_status['brake_duration'] * 0.1:.1f}s)")
+        print(f"  Brake acceleration: {braking_status['brake_acceleration']} m/s²")
     
     try:
         # Run simulation indefinitely
