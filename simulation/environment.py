@@ -60,37 +60,6 @@ class CircularHighway(gym.Env):
         self.agents = []
         self.av_indices = set()
         
-        if self.position_type == 'interleaved':
-            self._initialize_interleaved()
-        elif self.position_type == 'grouped':
-            self._initialize_grouped()
-        else:  # random
-            self._initialize_random()
-    
-    def _initialize_interleaved(self):
-        """Initialize agents in an alternating pattern with equal spacing between AVs."""
-        # First, create all AVs
-        for i in range(self.num_av):
-            self.agents.append(AutonomousAgent())
-            self.av_indices.add(i)
-        
-        # Then create all IDMs
-        for i in range(self.num_human):
-            self.agents.append(IDMAgent())
-    
-    def _initialize_grouped(self):
-        """Initialize agents in groups (all AVs together, then all humans)."""
-        # First, create all AVs
-        for i in range(self.num_av):
-            self.agents.append(AutonomousAgent())
-            self.av_indices.add(i)
-        
-        # Then create all IDMs
-        for i in range(self.num_human):
-            self.agents.append(IDMAgent())
-    
-    def _initialize_random(self):
-        """Initialize agents in random positions."""
         # First, create all AVs
         for i in range(self.num_av):
             self.agents.append(AutonomousAgent())
@@ -166,26 +135,18 @@ class CircularHighway(gym.Env):
     
     def _reset_grouped(self):
         """Reset vehicle positions in groups (AVs together, then humans)."""
-        # Calculate spacing for each group
-        av_spacing = (self.track_length / 2) / self.num_av if self.num_av > 0 else 0
-        human_spacing = (self.track_length / 2) / self.num_human if self.num_human > 0 else 0
+        # Calculate equal spacing for all vehicles
+        total_spacing = self.track_length / self.num_vehicles
         
-        # First, position all AVs in the first half of the track
-        av_count = 0
+        # Position all vehicles sequentially with equal spacing
         for i in range(self.num_vehicles):
             if i in self.av_indices:
-                # Position AVs in the first half of the track
-                self.state[i*2] = (av_count * av_spacing) % (self.track_length / 2)
-                av_count += 1
+                # Position AVs first
+                self.state[i*2] = (i * total_spacing) % self.track_length
+            else:
+                # Position IDM vehicles after AVs
+                self.state[i*2] = (i * total_spacing) % self.track_length
             self.state[i*2 + 1] = 0  # initial speed
-        
-        # Then, position all human vehicles in the second half of the track
-        human_count = 0
-        for i in range(self.num_vehicles):
-            if i not in self.av_indices:
-                # Position humans in the second half of the track
-                self.state[i*2] = (self.track_length / 2 + human_count * human_spacing) % self.track_length
-                human_count += 1
     
     def _reset_random(self):
         """Reset vehicle positions randomly while maintaining equal spacing."""
