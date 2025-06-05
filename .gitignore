@@ -14,3 +14,5 @@ venv
 
 # pycache
 __pycache__
+
+.vscode
