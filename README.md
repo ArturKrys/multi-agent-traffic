@@ -60,16 +60,64 @@ export PYTHONPATH="$PYTHONPATH:."  # On Windows, use: set PYTHONPATH=%PYTHONPATH
 
 ## Running the Simulation
 
-To run the example simulation:
+### Interactive Simulation
+
+To run the interactive simulation with customizable parameters:
 
 ```bash
-python -m simulation.example
+python -m simulation.run
 ```
 
-This will start a visualization showing:
-- Blue rectangles: Autonomous vehicles
-- Red rectangles: Human-driven vehicles (using IDM)
-- Numbers: Current speed of each vehicle
+The simulation will prompt you to configure:
+
+1. **Number of vehicles** (recommended: 4-12)
+   - Minimum: 2 vehicles
+   - Warning for >20 vehicles due to performance impact
+
+2. **Percentage of autonomous vehicles** (0-100%)
+   - Controls the ratio of AI-controlled vs human-driven vehicles
+
+3. **AV positioning strategy**:
+   - **Interleaved**: Autonomous and human vehicles alternate
+   - **Grouped**: Autonomous vehicles stay together
+   - **Random**: Random distribution
+
+4. **Autonomous vehicle control strategy**:
+   - **Random**: Random acceleration/deceleration within limits
+   - **Greedy**: Proportional control based on traffic conditions
+   - **Consensus-Based Control**: Coordinated behavior among autonomous vehicles
+   - **In-the-middle Rule Control**: Maintains safe distances using middle-distance rules
+
+5. **Controlled braking** (optional):
+   - Enable periodic braking events to test traffic flow response
+   - Configure braking frequency, duration, and intensity
+   - Select which vehicle performs the braking maneuver
+
+### Visualization
+
+The simulation displays a real-time visualization showing:
+- **Blue rectangles**: Autonomous vehicles
+- **Red rectangles**: Human-driven vehicles (using Intelligent Driver Model)
+- **Numbers**: Current speed of each vehicle (m/s)
+- **Circular track**: Single-lane highway with configurable length
+
+### Controls
+
+- **Close window** or **Ctrl+C**: Stop the simulation
+- The simulation runs indefinitely until manually stopped or a collision occurs
+
+### Example Usage
+
+```bash
+# Run with default settings (will prompt for configuration)
+python -m simulation.run
+
+# The simulation will guide you through setup with prompts like:
+# Enter the number of vehicles (recommended: 4-12): 8
+# Enter the percentage of autonomous vehicles (0 to 100): 50
+# Select AV positioning: [1] Interleaved [2] Grouped [3] Random: 1
+# Select AV agent type: [1] Random [2] Greedy [3] Consensus [4] In-the-middle: 3
+```
 
 ## Project Structure
 
@@ -99,7 +147,3 @@ class MyStrategy(AutonomousAgent):
         # Implement your control strategy here
         pass
 ```
-
-## License
-
-[Your chosen license]
