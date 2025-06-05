@@ -92,11 +92,31 @@ class HighwayVisualizer:
         if metrics['wave_detected']:
             metrics_text += "\nStatus: Traffic Wave Detected"
         
+        # Add controlled braking status if enabled
+        if hasattr(self.env, 'controlled_braking') and self.env.controlled_braking:
+            braking_status = self.env.get_braking_status()
+            metrics_text += f"\n\nControlled Braking:\n"
+            metrics_text += f"Agent: {braking_status['braking_agent']}\n"
+            metrics_text += f"Every {braking_status['brake_every_x_loops']} loops\n"
+            
+            if braking_status['braking_active']:
+                metrics_text += f"STATUS: BRAKING ({braking_status['braking_steps_remaining']} steps left)\n"
+            elif braking_status.get('recovery_active', False):
+                metrics_text += f"STATUS: RECOVERY ({braking_status['recovery_steps_remaining']} steps left)\n"
+            else:
+                metrics_text += f"STATUS: Monitoring\n"
+                
+            # Show loop counts
+            metrics_text += f"\nLoop Counts:\n"
+            for agent_id, count in braking_status['agent_loop_counts'].items():
+                marker = " <-- BRAKING AGENT" if agent_id == braking_status['braking_agent'] else ""
+                metrics_text += f"Agent {agent_id}: {count}{marker}\n"
+        
         # Display metrics
         self.ax_metrics.text(0.1, 0.9, metrics_text,
                            transform=self.ax_metrics.transAxes,
                            verticalalignment='top',
-                           fontsize=10,
+                           fontsize=9,
                            family='monospace')
     
     def on_close(self, event):
@@ -185,6 +205,17 @@ class HighwayVisualizer:
             else:
                 color = '#0066CC' if i in self.env.av_indices else '#FFA500'  # Blue for AVs, Orange for humans
             
+            # Check if this is the braking agent and it's actively braking
+            if (hasattr(self.env, 'controlled_braking') and self.env.controlled_braking and 
+                hasattr(self.env, 'braking_agent') and i == self.env.braking_agent):
+                if self.env.braking_active:
+                    color = '#FF0080'  # Magenta for active controlled braking
+                elif hasattr(self.env, 'recovery_active') and self.env.recovery_active:
+                    color = '#00FF80'  # Green for recovery acceleration
+                else:
+                    # Add a subtle border to indicate this is the designated braking agent
+                    color = '#0066CC' if i < self.env.num_av else '#FFA500'
+            
             vehicle_width = 10
             vehicle_height = 5
             
@@ -197,6 +228,13 @@ class HighwayVisualizer:
                 alpha=0.7,
                 picker=True
             )
+            
+            # Add border for braking agent when not actively braking
+            if (hasattr(self.env, 'controlled_braking') and self.env.controlled_braking and 
+                hasattr(self.env, 'braking_agent') and i == self.env.braking_agent and 
+                not self.env.braking_active):
+                vehicle.set_edgecolor('#FF0080')
+                vehicle.set_linewidth(2)
             
             self.ax_highway.add_patch(vehicle)
             self.vehicle_patches.append(vehicle)
