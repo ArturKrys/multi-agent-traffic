@@ -155,7 +155,7 @@ class HighwayVisualizer:
                 event.artist.set_color('#FF0000')
             else:
                 self.braking_vehicles.remove(i)
-                event.artist.set_color('#0066CC' if i < self.env.num_av else '#FFA500')
+                event.artist.set_color('#0066CC' if i in self.env.av_indices else '#FFA500')
             self.fig.canvas.draw()
     
     def update(self, state):
@@ -187,7 +187,7 @@ class HighwayVisualizer:
             lead_dist, lead_speed = self.env._get_leading_vehicle(i)
             if i in self.env.braking_vehicles:
                 acceleration = self.env.braking_deceleration
-            elif i < self.env.num_av:
+            elif i in self.env.av_indices:
                 acceleration = 0.0
             else:
                 acceleration = self.env.agents[i].act(speed, lead_dist, lead_speed)
@@ -201,9 +201,9 @@ class HighwayVisualizer:
             
             # Create vehicle patch
             if i in self.env.braking_vehicles:
-                color = '#FF0000'
+                color = '#FF0000'  # Red for braking
             else:
-                color = '#0066CC' if i < self.env.num_av else '#FFA500'
+                color = '#0066CC' if i in self.env.av_indices else '#FFA500'  # Blue for AVs, Orange for humans
             
             # Check if this is the braking agent and it's actively braking
             if (hasattr(self.env, 'controlled_braking') and self.env.controlled_braking and 

@@ -8,7 +8,7 @@ class CircularHighway(gym.Env):
     A single-lane circular highway environment for mixed autonomous and human-driven traffic.
     """
     
-    def __init__(self, num_vehicles=8, track_length=1000, av_percentage=0.5, 
+    def __init__(self, num_vehicles=8, track_length=1000, av_percentage=0.5, position_type='random', 
                  controlled_braking=False, brake_every_x_loops=10, brake_duration=50, 
                  brake_acceleration=-3.0, braking_agent_index=None, recovery_acceleration=4.0, recovery_duration=30):
         super().__init__()
@@ -48,22 +48,19 @@ class CircularHighway(gym.Env):
         self.num_av = int(num_vehicles * av_percentage)
         self.num_human = num_vehicles - self.num_av
         
-        # Initialize agents
-        self.agents = []
-        for i in range(num_vehicles):
-            if i < self.num_av:
-                self.agents.append(AutonomousAgent())
-            else:
-                self.agents.append(IDMAgent())
+        # Store position type
+        self.position_type = position_type
         
-        # Determine which agent will be the braking agent
-        if self.controlled_braking:
-            if self.braking_agent_index is not None:
-                self.braking_agent = self.braking_agent_index
-            else:
-                # Default to first IDM agent (first human-driven vehicle)
-                self.braking_agent = self.num_av if self.num_av < num_vehicles else 0
-                
+        # Initialize agents and state
+        self.agents = []
+        self.state = np.zeros(self.num_vehicles * 2)
+        
+        # Calculate base spacing between vehicles
+        self.spacing = self.track_length / self.num_vehicles
+        
+        # Initialize agents based on type
+        self._initialize_agents()
+        
         # State space: [position, speed] for each vehicle
         self.observation_space = spaces.Box(
             low=np.array([0, self.min_speed] * num_vehicles, dtype=np.float32),
@@ -82,6 +79,29 @@ class CircularHighway(gym.Env):
         self.braking_vehicles = set()
         self.reset()
     
+    def _initialize_agents(self):
+        """Initialize agents based on position type."""
+        self.agents = []
+        self.av_indices = set()
+        
+        # First, create all AVs
+        for i in range(self.num_av):
+            self.agents.append(AutonomousAgent())
+            self.av_indices.add(i)
+        
+        # Then create all IDMs
+        for i in range(self.num_human):
+            self.agents.append(IDMAgent())
+        
+        # Determine which agent will be the braking agent
+        if self.controlled_braking:
+            if self.braking_agent_index is not None:
+                self.braking_agent = self.braking_agent_index
+            else:
+                # Default to first IDM agent (first human-driven vehicle)
+                self.braking_agent = self.num_av if self.num_av < self.num_vehicles else 0
+        
+    
     def set_braking(self, vehicle_index, is_braking):
         """Set the braking state of a vehicle."""
         if is_braking:
@@ -93,16 +113,15 @@ class CircularHighway(gym.Env):
         """Reset the environment to initial state."""
         super().reset(seed=seed)
         
-        # Initialize vehicles with random positions and speeds
+        # Initialize positions and speeds of vehicles
         self.state = np.zeros(self.num_vehicles * 2)
         
-        # Distribute vehicles roughly evenly around the track
-        spacing = self.track_length / self.num_vehicles
-        for i in range(self.num_vehicles):
-            # Position with some random offset
-            self.state[i*2] = (i * spacing + self.np_random.uniform(-spacing/4, spacing/4)) % self.track_length
-            # Random initial speed
-            self.state[i*2 + 1] = self.np_random.uniform(self.min_speed, self.max_speed)
+        if self.position_type == 'interleaved':
+            self._reset_interleaved()
+        elif self.position_type == 'grouped':
+            self._reset_grouped()
+        else:  # random
+            self._reset_random()
         
         # Clear braking state
         self.braking_vehicles.clear()
@@ -117,6 +136,92 @@ class CircularHighway(gym.Env):
         self.last_positions = self.state[::2].copy()  # Get initial positions
         
         return self.state, {}
+    
+    def _reset_interleaved(self):
+        """Reset vehicle positions with equal spacing and proper alternation."""
+        # Calculate base spacing
+        spacing = self.track_length / self.num_vehicles
+
+        # Create the sequence of vehicle types
+        if self.num_av == self.num_human:
+            # Equal number of AVs and IDMs - perfect alternation
+            sequence = ['AV', 'IDM'] * (self.num_vehicles // 2)
+            if self.num_vehicles % 2 == 1:
+                sequence.append('IDM')  # Add one more IDM if odd number
+        elif self.num_av > self.num_human:
+            # More AVs than IDMs
+            avs_per_idm = self.num_av / self.num_human
+            sequence = []
+            for i in range(self.num_human):
+                sequence.extend(['AV'] * int(avs_per_idm))
+                sequence.append('IDM')
+            # Add remaining AVs
+            sequence.extend(['AV'] * (self.num_av - int(avs_per_idm) * self.num_human))
+        else:
+            # More IDMs than AVs
+            idms_per_av = self.num_human / self.num_av
+            sequence = []
+            for i in range(self.num_av):
+                sequence.append('AV')
+                sequence.extend(['IDM'] * int(idms_per_av))
+            # Add remaining IDMs
+            sequence.extend(['IDM'] * (self.num_human - int(idms_per_av) * self.num_av))
+
+        # Ensure we have exactly the right number of vehicles
+        sequence = sequence[:self.num_vehicles]
+
+        # Create temporary arrays for positions
+        av_positions = []
+        idm_positions = []
+
+        # Collect positions in order
+        for i, vehicle_type in enumerate(sequence):
+            position = (i * spacing) % self.track_length
+            if vehicle_type == 'AV':
+                av_positions.append(position)
+            else:
+                idm_positions.append(position)
+
+        # Now assign positions to state array
+        # First assign AV positions
+        for i in range(self.num_av):
+            self.state[i*2] = av_positions[i]
+            self.state[i*2 + 1] = 0  # initial speed
+
+        # Then assign IDM positions
+        for i in range(self.num_human):
+            self.state[(self.num_av + i)*2] = idm_positions[i]
+            self.state[(self.num_av + i)*2 + 1] = 0  # initial speed
+    
+    def _reset_grouped(self):
+        """Reset vehicle positions in groups (AVs together, then humans)."""
+        # Calculate equal spacing for all vehicles
+        total_spacing = self.track_length / self.num_vehicles
+        
+        # Position all vehicles sequentially with equal spacing
+        for i in range(self.num_vehicles):
+            if i in self.av_indices:
+                # Position AVs first
+                self.state[i*2] = (i * total_spacing) % self.track_length
+            else:
+                # Position IDM vehicles after AVs
+                self.state[i*2] = (i * total_spacing) % self.track_length
+            self.state[i*2 + 1] = 0  # initial speed
+    
+    def _reset_random(self):
+        """Reset vehicle positions randomly while maintaining equal spacing."""
+        # Generate random positions for all vehicles
+        positions = np.random.permutation(self.num_vehicles)
+        
+        # Calculate base spacing
+        spacing = self.track_length / self.num_vehicles
+        
+        # Assign positions to vehicles
+        for i in range(self.num_vehicles):
+            # Use the random position to determine where to place the vehicle
+            # while maintaining equal spacing between all vehicles
+            self.state[i*2] = (positions[i] * spacing) % self.track_length
+            self.state[i*2 + 1] = 0  # initial speed
     
     def _check_measurement_point_crossing(self):
         """Check if any vehicle has crossed the measurement point and update loop counts."""
@@ -216,6 +321,7 @@ class CircularHighway(gym.Env):
 
         # Calculate actions for all vehicles
         all_actions = np.zeros(self.num_vehicles)
+        av_count = 0  # Counter for AV actions
         
         for i in range(self.num_vehicles):
             speed = self.state[i*2 + 1]
@@ -229,8 +335,9 @@ class CircularHighway(gym.Env):
                 all_actions[i] = self.recovery_acceleration
             elif i in self.braking_vehicles:
                 all_actions[i] = self.braking_deceleration
-            elif i < self.num_av:
-                all_actions[i] = av_actions[i]
+            elif i in self.av_indices:
+                all_actions[i] = av_actions[av_count]
+                av_count += 1
             else:
                 all_actions[i] = self.agents[i].act(speed, lead_dist, lead_speed)
         
