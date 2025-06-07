@@ -1,6 +1,6 @@
 from .environment import CircularHighway
 from .visualization import HighwayVisualizer
-from .agents import IDMAgent, ConsensusBasedControlAgent, MiddleDistanceRuleAgent
+from .agents import IDMAgent, ConsensusBasedControlAgent, MiddleDistanceRuleAgent, GreedyAgent
 import numpy as np
 
 def get_user_input():
@@ -108,7 +108,7 @@ def main():
     controlled_braking, brake_every_x_loops, brake_duration, brake_acceleration, braking_agent_index = get_braking_parameters()
 
     # Create the environment with user-specified parameters
-    if agent_type == 'consensus' or agent_type == 'in_the_middle':
+    if agent_type == 'consensus' or agent_type == 'in_the_middle' or agent_type == 'greedy':
         class IntelligentHighway(CircularHighway):
             def __init__(self, num_vehicles, track_length, av_percentage, position_type, controlled_braking=False, 
                         brake_every_x_loops=10, brake_duration=50, brake_acceleration=-3.0, 
@@ -122,8 +122,11 @@ def main():
                         if agent_type == 'consensus':
                             self.agents.append(ConsensusBasedControlAgent())
                             self.av_indices.add(i)
-                        else:
+                        elif agent_type == 'in_the_middle':
                             self.agents.append(MiddleDistanceRuleAgent())
+                            self.av_indices.add(i)
+                        else:  # greedy
+                            self.agents.append(GreedyAgent())
                             self.av_indices.add(i)
                     else:
                         self.agents.append(IDMAgent())
@@ -131,7 +134,11 @@ def main():
                                controlled_braking=controlled_braking, brake_every_x_loops=brake_every_x_loops,
                                brake_duration=brake_duration, brake_acceleration=brake_acceleration,
                                braking_agent_index=braking_agent_index)
-        av_agent_name = "Consensus-Based Control" if agent_type == 'consensus' else "In-the-middle Rule Control"
+        av_agent_name = {
+            'consensus': "Consensus-Based Control",
+            'in_the_middle': "In-the-middle Rule Control",
+            'greedy': "Greedy Control"
+        }[agent_type]
     else:
         env = CircularHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage, position_type=position_type,
                             controlled_braking=controlled_braking, brake_every_x_loops=brake_every_x_loops,

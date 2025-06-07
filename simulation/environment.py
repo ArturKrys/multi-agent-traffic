@@ -143,7 +143,13 @@ class CircularHighway(gym.Env):
         spacing = self.track_length / self.num_vehicles
 
         # Create the sequence of vehicle types
-        if self.num_av == self.num_human:
+        if self.num_human == 0:
+            # If there are no IDM vehicles, just use all AVs
+            sequence = ['AV'] * self.num_vehicles
+        elif self.num_av == 0:
+            # If there are no AVs, just use all IDMs
+            sequence = ['IDM'] * self.num_vehicles
+        elif self.num_av == self.num_human:
             # Equal number of AVs and IDMs - perfect alternation
             sequence = ['AV', 'IDM'] * (self.num_vehicles // 2)
             if self.num_vehicles % 2 == 1:

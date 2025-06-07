@@ -194,3 +194,94 @@ class MiddleDistanceRuleAgent(AutonomousAgent):
             actions[i] = acc
 
         return actions
+
+class GreedyAgent(AutonomousAgent):
+    """
+    A greedy agent that tries to maximize its speed while maintaining safety.
+    - Always tries to accelerate to maximum speed
+    - Only brakes when necessary to avoid collision
+    - Tries to match the speed of the vehicle ahead when close
+    """
+    
+    def __init__(
+        self,
+        desired_speed=30.0,
+        max_acceleration=3.0,
+        max_deceleration=-5.0,
+        track_length=1000,
+        safety_margin=20.0  # Minimum safe distance in meters
+    ):
+        super().__init__(desired_speed)
+        self.max_acceleration = max_acceleration
+        self.max_deceleration = max_deceleration
+        self.track_length = track_length
+        self.safety_margin = safety_margin
+
+    @staticmethod
+    def _circular_distance(pos1, pos2, track_length):
+        """Compute forward distance from pos1 to pos2 on a circular track."""
+        return (pos2 - pos1) % track_length
+
+    def get_actions(self, state, num_av):
+        """
+        For each AV, compute acceleration based on greedy strategy:
+        - Accelerate as much as possible
+        - Only brake when necessary to avoid collision
+        - Try to match speed of vehicle ahead when close
+
+        Args:
+            state: [pos0, speed0, pos1, speed1, …, posN, speedN]
+            num_av: number of AVs (assumed to occupy indices 0..num_av-1)
+
+        Returns:
+            actions: np.ndarray of length num_av, containing one accel for each AV.
+        """
+        num_vehicles = len(state) // 2
+        positions = [state[2*i] for i in range(num_vehicles)]
+        speeds = [state[2*i+1] for i in range(num_vehicles)]
+        actions = np.zeros(num_av)
+
+        for i in range(num_av):
+            my_pos = positions[i]
+            my_speed = speeds[i]
+
+            # Find the vehicle ahead
+            min_front_gap = float('inf')
+            front_idx = None
+            front_speed = None
+
+            for j in range(num_vehicles):
+                if j == i:
+                    continue
+                gap_forward = (positions[j] - my_pos) % self.track_length
+                if 0 < gap_forward < min_front_gap:
+                    min_front_gap = gap_forward
+                    front_idx = j
+                    front_speed = speeds[j]
+
+            # Default to maximum acceleration
+            acc = self.max_acceleration
+
+            if front_idx is not None:
+                # If we're too close to the vehicle ahead, we need to brake
+                if min_front_gap < self.safety_margin:
+                    # Emergency braking
+                    acc = self.max_deceleration
+                # If we're close but not too close, try to match speed
+                elif min_front_gap < 2 * self.safety_margin:
+                    # Match speed of vehicle ahead with some margin
+                    speed_diff = front_speed - my_speed
+                    if speed_diff > 0:
+                        # Vehicle ahead is faster, accelerate to match
+                        acc = min(self.max_acceleration, speed_diff * 2.0)
+                    else:
+                        # Vehicle ahead is slower, brake to match
+                        acc = max(self.max_deceleration, speed_diff * 2.0)
+                # If we're far enough, accelerate to desired speed
+                else:
+                    acc = min(self.max_acceleration, 2.0 * (self.desired_speed - my_speed))
+
+            # Clip acceleration to valid range
+            actions[i] = np.clip(acc, self.max_deceleration, self.max_acceleration)
+
+        return actions
