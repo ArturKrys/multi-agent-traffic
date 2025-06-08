@@ -128,6 +128,17 @@ The implemented code allows for three distribution strategies determine the init
 
 *Random Distribution:* Vehicles are distributed randomly throughout the environment, representing realistic deployment scenarios where autonomous vehicle presence occurs gradually and unpredictably.
 
+== Relation to course content
+
+The chapters from the theorical lectures that were most relevant to this project were:
+
+- Lecture 1: Agent Properties
+  - The chapter introduces the basic design of the simulation, with the simulation environment and the agent models.
+
+- Lecture 5: Coordination
+  - The chapter introduces the concept of coordination in multi-agent systems.
+  - Our project implements a basic version of the Consensus-Based Control algorithm, which is a coordination strategy that allows for the autonomous vehicles to coordinate their actions in order to reach a consensus.
+
 = Results and Analysis
 
 == Experimental Setup
@@ -216,6 +227,12 @@ After 50% AV penetration rate, we can see a choice between having a more reactiv
 
 The choice of algorithms should have in mind its application. Perhaps the users don't want to always be accelerating and braking, and would prefer a more stable speed and flow. On the other way, if the users want to sacrifice comfort for a more efficient flow, they could choose the Greedy or SBC strategy.
 
+== Solution Limitations
+
+The current model is a simple model, with a circular spatial domain and a fixed number of vehicles. It would be interesting to see how the different coordination strategies perform in a more complex spatial domain, with more vehicles and more complex traffic scenarios.
+
+It would also be interesting to see how the different coordination strategies perform in a more complex spatial domain, with more vehicles and more complex traffic scenarios.
+
 = Conclusion
 
 This project demonstrates the significant potential of distributed coordination strategies to achieve superior collective behavior in traffic systems. Our simulation framework, while being a simple model, was able to show the potential of the different coordination strategies.
@@ -223,10 +240,6 @@ This project demonstrates the significant potential of distributed coordination 
 The results show that the Consensus-Based Control (CBC) and the Spatial Rule-Based Control (SBC) are the best performing strategies, achieving superior collective performance and system stability compared to individualistic vehicle strategies.
 
 The Autonomous Vehicle Population Ratio Analysis shows that the choice of algorithms should have in mind its application. Perhaps the users don't want to always be accelerating and braking, and would prefer a more stable speed and flow. On the other way, if the users want to sacrifice comfort for a more efficient flow, they could choose the Greedy or SBC strategy.
-
-The current model is a simple model, with a circular spatial domain and a fixed number of vehicles. It would be interesting to see how the different coordination strategies perform in a more complex spatial domain, with more vehicles and more complex traffic scenarios.
-
-It would also be interesting to see how the different coordination strategies perform in a more complex spatial domain, with more vehicles and more complex traffic scenarios.
 
 #bibliography(
   "refs.bib",
