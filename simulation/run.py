@@ -225,6 +225,9 @@ def main(user_input = True, num_vehicles=None, av_percentage=None, position_type
             
             if terminated or truncated:
                 print("Collision detected! Closing simulation...")
+                print(f"Collision at step {step_count}")
+                print(f"Strategy: {av_agent_name}")
+                print(f"AV penetration rate: {av_percentage:.1%}")
                 break
                 
     except KeyboardInterrupt:
