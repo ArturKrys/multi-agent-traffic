@@ -8,7 +8,7 @@ class CircularHighway(gym.Env):
     A single-lane circular highway environment for mixed autonomous and human-driven traffic.
     """
     
-    def __init__(self, num_vehicles=8, track_length=1000, av_percentage=0.5, position_type='random', 
+    def __init__(self, num_vehicles=8, track_length=10000, av_percentage=0.5, position_type='random', 
                  controlled_braking=False, brake_every_x_loops=10, brake_duration=50, 
                  brake_acceleration=-3.0, braking_agent_index=None, recovery_acceleration=4.0, recovery_duration=30):
         super().__init__()
