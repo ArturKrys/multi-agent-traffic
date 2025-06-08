@@ -5,6 +5,21 @@ import numpy as np
 
 def get_user_input():
     """Get user input for simulation parameters."""
+    # Get track length
+    while True:
+        try:
+            track_length = input("Enter track length in meters (default 1000): ").strip()
+            if not track_length:
+                track_length = 1000
+                break
+            track_length = int(track_length)
+            if track_length < 500:
+                print("Please enter a track length of at least 500 meters.")
+                continue
+            break
+        except ValueError:
+            print("Please enter a valid number.")
+    
     # Get number of vehicles
     while True:
         try:
@@ -65,7 +80,7 @@ def get_user_input():
         else:
             print("Please enter a valid choice (1, 2, 3, 4).")
     
-    return num_vehicles, av_percentage, position_type, agent_type
+    return track_length, num_vehicles, av_percentage, position_type, agent_type
 
 def get_braking_parameters():
     """Get user input for controlled braking parameters."""
@@ -104,11 +119,15 @@ def get_braking_parameters():
 
 def main(user_input = True, num_vehicles=None, av_percentage=None, position_type=None, agent_type=None,
          controlled_braking=None, brake_every_x_loops=None, brake_duration=None, 
-         brake_acceleration=None, braking_agent_index=None, sim_duration=None):
+         brake_acceleration=None, braking_agent_index=None, sim_duration=None, track_length=None):
     if user_input:
         # Get user input for simulation parameters
-        num_vehicles, av_percentage, position_type, agent_type = get_user_input()
+        track_length, num_vehicles, av_percentage, position_type, agent_type = get_user_input()
         controlled_braking, brake_every_x_loops, brake_duration, brake_acceleration, braking_agent_index = get_braking_parameters()
+    
+    # Set default track_length if not provided
+    if track_length is None:
+        track_length = 1000
 
     # Create the environment with user-specified parameters
     if agent_type == 'consensus' or agent_type == 'in_the_middle' or agent_type == 'greedy' or agent_type == 'random':
@@ -123,20 +142,20 @@ def main(user_input = True, num_vehicles=None, av_percentage=None, position_type
                 for i in range(num_vehicles):
                     if i < self.num_av:
                         if agent_type == 'consensus':
-                            self.agents.append(ConsensusBasedControlAgent())
+                            self.agents.append(ConsensusBasedControlAgent(track_length=track_length, desired_speed=25.0))
                             self.av_indices.add(i)
                         elif agent_type == 'in_the_middle':
-                            self.agents.append(MiddleDistanceRuleAgent())
+                            self.agents.append(MiddleDistanceRuleAgent(track_length=track_length, desired_speed=25.0))
                             self.av_indices.add(i)
                         elif agent_type == 'greedy':
-                            self.agents.append(GreedyAgent())
+                            self.agents.append(GreedyAgent(track_length=track_length, desired_speed=25.0))
                             self.av_indices.add(i)
                         else:  # random
-                            self.agents.append(RandomAgent())
+                            self.agents.append(RandomAgent(track_length=track_length, desired_speed=25.0))
                             self.av_indices.add(i)
                     else:
-                        self.agents.append(IDMAgent())
-        env = IntelligentHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage, position_type=position_type,
+                        self.agents.append(IDMAgent(desired_speed=25.0))
+        env = IntelligentHighway(num_vehicles=num_vehicles, track_length=track_length, av_percentage=av_percentage, position_type=position_type,
                                controlled_braking=controlled_braking, brake_every_x_loops=brake_every_x_loops,
                                brake_duration=brake_duration, brake_acceleration=brake_acceleration,
                                braking_agent_index=braking_agent_index)
@@ -147,7 +166,7 @@ def main(user_input = True, num_vehicles=None, av_percentage=None, position_type
             'random': "Random Control"
         }[agent_type]
     else:
-        env = CircularHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage, position_type=position_type,
+        env = CircularHighway(num_vehicles=num_vehicles, track_length=track_length, av_percentage=av_percentage, position_type=position_type,
                             controlled_braking=controlled_braking, brake_every_x_loops=brake_every_x_loops,
                             brake_duration=brake_duration, brake_acceleration=brake_acceleration,
                             braking_agent_index=braking_agent_index)
@@ -162,6 +181,7 @@ def main(user_input = True, num_vehicles=None, av_percentage=None, position_type
     state, _ = env.reset(seed=42)
     
     print("\nSimulation running...")
+    print(f"Track length: {track_length} meters")
     print(f"Total vehicles: {num_vehicles}")
     print(f"Autonomous vehicles: {int(num_vehicles * av_percentage)}")
     print(f"Human-driven vehicles: {num_vehicles - int(num_vehicles * av_percentage)}")
@@ -205,6 +225,9 @@ def main(user_input = True, num_vehicles=None, av_percentage=None, position_type
             
             if terminated or truncated:
                 print("Collision detected! Closing simulation...")
+                print(f"Collision at step {step_count}")
+                print(f"Strategy: {av_agent_name}")
+                print(f"AV penetration rate: {av_percentage:.1%}")
                 break
                 
     except KeyboardInterrupt:
