@@ -1,14 +1,13 @@
 import os
 import json
 import matplotlib.pyplot as plt
-from datetime import datetime
 import sys
 
 # Path to the merged JSON file (can be overridden by command line argument)
 if len(sys.argv) > 1:
     JSON_PATH = sys.argv[1]
 else:
-    JSON_PATH = os.path.join('results', '12veh_1000m_AvPenVar_random_AgTypeVar_True_3_50_-6.0_None_1800seconds.json')
+    JSON_PATH = os.path.join('results', '100veh_10000m_AvPenVar_random_AgTypeVar_True_3_50_-6.0_None_3600seconds.json')
 
 print(f"Loading data from: {JSON_PATH}")
 
@@ -155,11 +154,6 @@ for field, label in metrics:
     fig.text(0.75, 0.5, 'Simulation Parameters:\n\n' + param_text, 
              va='center', ha='left', fontsize=9, family='monospace',
              bbox=dict(boxstyle="round,pad=0.5", facecolor="lightgray", alpha=0.8))
-    
-    # Add timestamp
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    fig.text(0.75, 0.02, f'Generated: {timestamp}', 
-             ha='left', fontsize=8, style='italic', alpha=0.7)
 
     plt.show()
 
