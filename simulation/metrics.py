@@ -228,3 +228,17 @@ class MetricsTracker:
             
         fig.canvas.mpl_connect('close_event', on_close)
         plt.show()
+
+    def get_final_averages(self):
+        """
+        Compute average values over the entire simulation period.
+        Returns a dictionary with final average values.
+        """
+        return {
+            'avg_flow_rate_over_simulation': np.mean(self.historical_flow_rates) if self.historical_flow_rates else 0.0,
+            'avg_speed_over_simulation': np.mean(self.historical_avg_speeds) if self.historical_avg_speeds else 0.0,
+            'avg_speed_variance_over_simulation': np.mean(self.historical_speed_variances) if self.historical_speed_variances else 0.0,
+            'wave_formation_time': self.wave_formation_time,
+            'wave_dissipation_time': self.wave_dissipation_time,
+
+        }
