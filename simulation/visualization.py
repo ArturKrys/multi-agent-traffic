@@ -17,6 +17,8 @@ class HighwayVisualizer:
         self.braking_vehicles = set()
         self.running = True
         
+        self.plot_graphs = True
+
         # Initialize metrics tracker
         self.metrics_tracker = MetricsTracker(env.track_length, env.num_vehicles)
         
@@ -262,8 +264,9 @@ class HighwayVisualizer:
         self.update_metrics_display()
         
         # Update the plot
-        self.fig.canvas.draw()
-        plt.pause(0.01)
+        if self.plot_graphs:
+            self.fig.canvas.draw()
+            plt.pause(0.01)
         return self.running
 
     def close(self):
@@ -271,4 +274,6 @@ class HighwayVisualizer:
         self.cleanup()
         
         # Show metrics plot
-        self.metrics_tracker.plot_metrics() 
+        if self.plot_graphs:
+            self.metrics_tracker.plot_metrics() 
+        return self.metrics_tracker.get_final_averages()

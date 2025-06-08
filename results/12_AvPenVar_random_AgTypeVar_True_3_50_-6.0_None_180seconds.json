@@ -1,0 +1,290 @@
+[
+  {
+    "avg_flow_rate_over_simulation": 0.21787709497206703,
+    "avg_speed_over_simulation": 18.483344561773823,
+    "avg_speed_variance_over_simulation": 2.857305325557777,
+    "wave_formation_time": 80.99999999999926,
+    "wave_dissipation_time": 1.6999999999999034,
+    "av_percentage": 0.1,
+    "agent_type": "random"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.21787709497206703,
+    "avg_speed_over_simulation": 17.58672816463177,
+    "avg_speed_variance_over_simulation": 1.184992832097719,
+    "wave_formation_time": 39.40000000000036,
+    "wave_dissipation_time": 1.599999999999909,
+    "av_percentage": 0.2,
+    "agent_type": "random"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.21787709497206703,
+    "avg_speed_over_simulation": 17.38959245678743,
+    "avg_speed_variance_over_simulation": 1.0361336539617578,
+    "wave_formation_time": 36.800000000000324,
+    "wave_dissipation_time": 1.6999999999999034,
+    "av_percentage": 0.30000000000000004,
+    "agent_type": "random"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2011173184357542,
+    "avg_speed_over_simulation": 17.191936250630317,
+    "avg_speed_variance_over_simulation": 0.6385898847662763,
+    "wave_formation_time": 23.80000000000013,
+    "wave_dissipation_time": 1.6999999999999034,
+    "av_percentage": 0.4,
+    "agent_type": "random"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2011173184357542,
+    "avg_speed_over_simulation": 17.076933460047552,
+    "avg_speed_variance_over_simulation": 0.5786560711672933,
+    "wave_formation_time": 21.800000000000093,
+    "wave_dissipation_time": 1.7999999999998977,
+    "av_percentage": 0.5,
+    "agent_type": "random"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2011173184357542,
+    "avg_speed_over_simulation": 17.034126826890283,
+    "avg_speed_variance_over_simulation": 0.5367966976020594,
+    "wave_formation_time": 21.100000000000087,
+    "wave_dissipation_time": 1.6999999999999034,
+    "av_percentage": 0.6000000000000001,
+    "agent_type": "random"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2011173184357542,
+    "avg_speed_over_simulation": 16.938649926522082,
+    "avg_speed_variance_over_simulation": 0.24640601228574038,
+    "wave_formation_time": 7.599999999999973,
+    "wave_dissipation_time": 1.6999999999999176,
+    "av_percentage": 0.7000000000000001,
+    "agent_type": "random"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2011173184357542,
+    "avg_speed_over_simulation": 16.897041899060856,
+    "avg_speed_variance_over_simulation": 0.21765575658029657,
+    "wave_formation_time": 6.699999999999976,
+    "wave_dissipation_time": 1.6999999999999034,
+    "av_percentage": 0.8,
+    "agent_type": "random"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.27932960893854747,
+    "avg_speed_over_simulation": 23.523732742520792,
+    "avg_speed_variance_over_simulation": 0.316709867921856,
+    "wave_formation_time": 5.2999999999999865,
+    "wave_dissipation_time": 0.6999999999999602,
+    "av_percentage": 0.1,
+    "agent_type": "greedy"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.27932960893854747,
+    "avg_speed_over_simulation": 23.671478647957173,
+    "avg_speed_variance_over_simulation": 0.43223569133762446,
+    "wave_formation_time": 6.099999999999987,
+    "wave_dissipation_time": 4.999999999999716,
+    "av_percentage": 0.2,
+    "agent_type": "greedy"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.27932960893854747,
+    "avg_speed_over_simulation": 23.815028674246854,
+    "avg_speed_variance_over_simulation": 0.5323336235078877,
+    "wave_formation_time": 6.499999999999986,
+    "wave_dissipation_time": 4.99999999999973,
+    "av_percentage": 0.30000000000000004,
+    "agent_type": "greedy"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2849162011173184,
+    "avg_speed_over_simulation": 23.967524504709544,
+    "avg_speed_variance_over_simulation": 0.6866359242363782,
+    "wave_formation_time": 6.799999999999986,
+    "wave_dissipation_time": 5.599999999999696,
+    "av_percentage": 0.4,
+    "agent_type": "greedy"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2849162011173184,
+    "avg_speed_over_simulation": 24.240057410277323,
+    "avg_speed_variance_over_simulation": 1.4173754331282418,
+    "wave_formation_time": 27.500000000000142,
+    "wave_dissipation_time": 4.999999999999716,
+    "av_percentage": 0.5,
+    "agent_type": "greedy"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.29608938547486036,
+    "avg_speed_over_simulation": 24.447722723896895,
+    "avg_speed_variance_over_simulation": 1.520682165115306,
+    "wave_formation_time": 27.700000000000145,
+    "wave_dissipation_time": 6.199999999999648,
+    "av_percentage": 0.6000000000000001,
+    "agent_type": "greedy"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2849162011173184,
+    "avg_speed_over_simulation": 24.687743372377945,
+    "avg_speed_variance_over_simulation": 1.4332268421836725,
+    "wave_formation_time": 31.700000000000205,
+    "wave_dissipation_time": 5.09999999999971,
+    "av_percentage": 0.7000000000000001,
+    "agent_type": "greedy"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.29608938547486036,
+    "avg_speed_over_simulation": 24.879197317388805,
+    "avg_speed_variance_over_simulation": 2.0722967112015547,
+    "wave_formation_time": 44.30000000000038,
+    "wave_dissipation_time": 7.299999999999585,
+    "av_percentage": 0.8,
+    "agent_type": "greedy"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.27932960893854747,
+    "avg_speed_over_simulation": 23.483602822657176,
+    "avg_speed_variance_over_simulation": 0.2871030732130479,
+    "wave_formation_time": 2.5999999999999908,
+    "wave_dissipation_time": 0.9999999999999432,
+    "av_percentage": 0.1,
+    "agent_type": "consensus"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.27932960893854747,
+    "avg_speed_over_simulation": 23.591063631360417,
+    "avg_speed_variance_over_simulation": 0.3646493248203213,
+    "wave_formation_time": 5.59999999999998,
+    "wave_dissipation_time": 0.9999999999999432,
+    "av_percentage": 0.2,
+    "agent_type": "consensus"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2849162011173184,
+    "avg_speed_over_simulation": 23.674823764498523,
+    "avg_speed_variance_over_simulation": 0.7176418834441929,
+    "wave_formation_time": 6.799999999999979,
+    "wave_dissipation_time": 0.6999999999999602,
+    "av_percentage": 0.30000000000000004,
+    "agent_type": "consensus"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.27932960893854747,
+    "avg_speed_over_simulation": 23.766418347646393,
+    "avg_speed_variance_over_simulation": 0.8236645110601437,
+    "wave_formation_time": 9.299999999999972,
+    "wave_dissipation_time": 1.6999999999999034,
+    "av_percentage": 0.4,
+    "agent_type": "consensus"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2849162011173184,
+    "avg_speed_over_simulation": 23.995718581795686,
+    "avg_speed_variance_over_simulation": 1.5972838623082777,
+    "wave_formation_time": 9.999999999999972,
+    "wave_dissipation_time": 1.299999999999926,
+    "av_percentage": 0.5,
+    "agent_type": "consensus"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2849162011173184,
+    "avg_speed_over_simulation": 24.135505687182594,
+    "avg_speed_variance_over_simulation": 0.7802074969003688,
+    "wave_formation_time": 8.899999999999974,
+    "wave_dissipation_time": 3.8999999999997783,
+    "av_percentage": 0.6000000000000001,
+    "agent_type": "consensus"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2849162011173184,
+    "avg_speed_over_simulation": 24.298255990990587,
+    "avg_speed_variance_over_simulation": 1.0529334637116459,
+    "wave_formation_time": 8.899999999999974,
+    "wave_dissipation_time": 0.6999999999999602,
+    "av_percentage": 0.7000000000000001,
+    "agent_type": "consensus"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2905027932960894,
+    "avg_speed_over_simulation": 24.305884189641592,
+    "avg_speed_variance_over_simulation": 1.7174132785997336,
+    "wave_formation_time": 8.399999999999974,
+    "wave_dissipation_time": 4.799999999999727,
+    "av_percentage": 0.8,
+    "agent_type": "consensus"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.27932960893854747,
+    "avg_speed_over_simulation": 23.4732646756209,
+    "avg_speed_variance_over_simulation": 0.19999170649185866,
+    "wave_formation_time": 5.599999999999682,
+    "wave_dissipation_time": 0.8999999999999488,
+    "av_percentage": 0.1,
+    "agent_type": "in_the_middle"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.27932960893854747,
+    "avg_speed_over_simulation": 23.54954884280139,
+    "avg_speed_variance_over_simulation": 0.23026221843633998,
+    "wave_formation_time": 3.199999999999989,
+    "wave_dissipation_time": 1.0999999999999375,
+    "av_percentage": 0.2,
+    "agent_type": "in_the_middle"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2849162011173184,
+    "avg_speed_over_simulation": 23.62527581239304,
+    "avg_speed_variance_over_simulation": 0.25145936611904696,
+    "wave_formation_time": 4.199999999999989,
+    "wave_dissipation_time": 1.1999999999999318,
+    "av_percentage": 0.30000000000000004,
+    "agent_type": "in_the_middle"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.27932960893854747,
+    "avg_speed_over_simulation": 23.71255511544283,
+    "avg_speed_variance_over_simulation": 0.355055243889237,
+    "wave_formation_time": 7.699999999999977,
+    "wave_dissipation_time": 1.0999999999999375,
+    "av_percentage": 0.4,
+    "agent_type": "in_the_middle"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2849162011173184,
+    "avg_speed_over_simulation": 23.884988458089772,
+    "avg_speed_variance_over_simulation": 0.36022484865258636,
+    "wave_formation_time": 7.799999999999978,
+    "wave_dissipation_time": 1.4999999999999147,
+    "av_percentage": 0.5,
+    "agent_type": "in_the_middle"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2849162011173184,
+    "avg_speed_over_simulation": 23.994498031064566,
+    "avg_speed_variance_over_simulation": 0.43339759353826873,
+    "wave_formation_time": 10.299999999999969,
+    "wave_dissipation_time": 8.199999999999534,
+    "av_percentage": 0.6000000000000001,
+    "agent_type": "in_the_middle"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2849162011173184,
+    "avg_speed_over_simulation": 24.091673368964713,
+    "avg_speed_variance_over_simulation": 0.35452634039535397,
+    "wave_formation_time": 6.69999999999998,
+    "wave_dissipation_time": 8.09999999999954,
+    "av_percentage": 0.7000000000000001,
+    "agent_type": "in_the_middle"
+  },
+  {
+    "avg_flow_rate_over_simulation": 0.2849162011173184,
+    "avg_speed_over_simulation": 24.266736790100357,
+    "avg_speed_variance_over_simulation": 0.8247660404635243,
+    "wave_formation_time": 23.1000000000001,
+    "wave_dissipation_time": 8.7999999999995,
+    "av_percentage": 0.8,
+    "agent_type": "in_the_middle"
+  }
+]

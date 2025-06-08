@@ -102,10 +102,13 @@ def get_braking_parameters():
         except ValueError:
             print("Please enter valid numbers.")
 
-def main():
-    # Get user input for simulation parameters
-    num_vehicles, av_percentage, position_type, agent_type = get_user_input()
-    controlled_braking, brake_every_x_loops, brake_duration, brake_acceleration, braking_agent_index = get_braking_parameters()
+def main(user_input = True, num_vehicles=None, av_percentage=None, position_type=None, agent_type=None,
+         controlled_braking=None, brake_every_x_loops=None, brake_duration=None, 
+         brake_acceleration=None, braking_agent_index=None, sim_duration=None):
+    if user_input:
+        # Get user input for simulation parameters
+        num_vehicles, av_percentage, position_type, agent_type = get_user_input()
+        controlled_braking, brake_every_x_loops, brake_duration, brake_acceleration, braking_agent_index = get_braking_parameters()
 
     # Create the environment with user-specified parameters
     if agent_type == 'consensus' or agent_type == 'in_the_middle' or agent_type == 'greedy' or agent_type == 'random':
@@ -152,6 +155,8 @@ def main():
 
     # Create the visualizer
     vis = HighwayVisualizer(env)
+    if not user_input:
+        vis.plot_graphs = False
     
     # Reset the environment
     state, _ = env.reset(seed=42)
@@ -196,7 +201,7 @@ def main():
     except KeyboardInterrupt:
         print("\nSimulation stopped by user")
     finally:
-        vis.close()
+        return vis.close()
 
 if __name__ == "__main__":
     main() 
