@@ -188,7 +188,15 @@ class HighwayVisualizer:
             if i in self.env.braking_vehicles:
                 acceleration = self.env.braking_deceleration
             elif i in self.env.av_indices:
-                acceleration = 0.0
+                # Get the actual acceleration being applied to AVs from the environment
+                av_index = list(self.env.av_indices).index(i)
+                if hasattr(self.env.agents[0], 'get_actions'):
+                    # For intelligent agents (consensus, middle distance, greedy, random)
+                    av_actions = self.env.agents[0].get_actions(self.env.state, self.env.num_av)
+                    acceleration = av_actions[av_index]
+                else:
+                    # For basic AVs
+                    acceleration = self.env.agents[av_index].act(speed, lead_dist, lead_speed)
             else:
                 acceleration = self.env.agents[i].act(speed, lead_dist, lead_speed)
             

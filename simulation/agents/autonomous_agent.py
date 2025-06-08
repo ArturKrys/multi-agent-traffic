@@ -285,3 +285,40 @@ class GreedyAgent(AutonomousAgent):
             actions[i] = np.clip(acc, self.max_deceleration, self.max_acceleration)
 
         return actions
+
+class RandomAgent(AutonomousAgent):
+    """
+    An agent that chooses random actions within safe acceleration limits.
+    Each agent independently selects a random acceleration value between max_deceleration and max_acceleration.
+    """
+    
+    def __init__(
+        self,
+        desired_speed=30.0,
+        max_acceleration=3.0,
+        max_deceleration=-5.0,
+        track_length=1000
+    ):
+        super().__init__(desired_speed)
+        self.max_acceleration = max_acceleration
+        self.max_deceleration = max_deceleration
+        self.track_length = track_length
+
+    def get_actions(self, state, num_av):
+        """
+        Generate random actions for each autonomous vehicle.
+        
+        Args:
+            state: [pos0, speed0, pos1, speed1, …, posN, speedN]
+            num_av: number of AVs (assumed to occupy indices 0..num_av-1)
+            
+        Returns:
+            actions: np.ndarray of length num_av, containing random accelerations for each AV
+        """
+        # Generate random actions between max_deceleration and max_acceleration
+        actions = np.random.uniform(
+            low=self.max_deceleration,
+            high=self.max_acceleration,
+            size=num_av
+        )
+        return actions

@@ -1,6 +1,6 @@
 from .environment import CircularHighway
 from .visualization import HighwayVisualizer
-from .agents import IDMAgent, ConsensusBasedControlAgent, MiddleDistanceRuleAgent, GreedyAgent
+from .agents import IDMAgent, ConsensusBasedControlAgent, MiddleDistanceRuleAgent, GreedyAgent, RandomAgent
 import numpy as np
 
 def get_user_input():
@@ -108,7 +108,7 @@ def main():
     controlled_braking, brake_every_x_loops, brake_duration, brake_acceleration, braking_agent_index = get_braking_parameters()
 
     # Create the environment with user-specified parameters
-    if agent_type == 'consensus' or agent_type == 'in_the_middle' or agent_type == 'greedy':
+    if agent_type == 'consensus' or agent_type == 'in_the_middle' or agent_type == 'greedy' or agent_type == 'random':
         class IntelligentHighway(CircularHighway):
             def __init__(self, num_vehicles, track_length, av_percentage, position_type, controlled_braking=False, 
                         brake_every_x_loops=10, brake_duration=50, brake_acceleration=-3.0, 
@@ -125,8 +125,11 @@ def main():
                         elif agent_type == 'in_the_middle':
                             self.agents.append(MiddleDistanceRuleAgent())
                             self.av_indices.add(i)
-                        else:  # greedy
+                        elif agent_type == 'greedy':
                             self.agents.append(GreedyAgent())
+                            self.av_indices.add(i)
+                        else:  # random
+                            self.agents.append(RandomAgent())
                             self.av_indices.add(i)
                     else:
                         self.agents.append(IDMAgent())
@@ -137,7 +140,8 @@ def main():
         av_agent_name = {
             'consensus': "Consensus-Based Control",
             'in_the_middle': "In-the-middle Rule Control",
-            'greedy': "Greedy Control"
+            'greedy': "Greedy Control",
+            'random': "Random Control"
         }[agent_type]
     else:
         env = CircularHighway(num_vehicles=num_vehicles, track_length=1000, av_percentage=av_percentage, position_type=position_type,
@@ -169,7 +173,7 @@ def main():
     try:
         # Run simulation indefinitely
         while vis.running:
-            if agent_type == 'consensus' or agent_type == 'in_the_middle':
+            if agent_type in ['consensus', 'in_the_middle', 'greedy', 'random']:
                 # No need to provide actions; environment computes them
                 state, rewards, terminated, truncated, _ = env.step()
             else:
