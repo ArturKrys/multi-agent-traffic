@@ -46,25 +46,21 @@
 
 = Abstract
 
-This paper presents a multi-agent system framework for studying cooperative behavior and coordination strategies in a dynamic traffic environment. Our simulation models autonomous vehicles operating in a shared circular highway environment, where they must coordinate their actions while interacting with human-driven vehicles. We implement and compare four multi-agent coordination strategies: random behavior, greedy local optimization, rule-based Bi-lateral Control, and distributed Consensus-Based Control (CBC). The framework enables systematic analysis of emergent collective behavior, vehicle interaction patterns, and the effects of different coordination mechanisms on system-wide performance.
-// TODO: Change this based on the results
-Results demonstrate that distributed coordination algorithms, particularly consensus-based approaches and spatial rule systems, achieve superior collective performance and system stability compared to individualistic vehicle strategies.
+This paper presents a multi-agent system framework for studying coordination strategies to mitigate phantom traffic jams in dynamic highway environments. Phantom jams—spontaneous traffic congestion that emerges without apparent causes—represent a significant challenge in transportation systems that autonomous vehicles could help address. Our simulation models autonomous vehicles operating in a shared circular highway environment, where they must coordinate their actions while interacting with human-driven vehicles to prevent and dissipate phantom jams. We implement and compare four multi-agent coordination strategies: random behavior, greedy local optimization, rule-based Spatial Control, and distributed Consensus-Based Control (CBC). The framework enables systematic analysis of phantom jam formation, dissipation patterns, and the effectiveness of different coordination mechanisms in maintaining traffic flow stability.
+
+Results demonstrate that distributed coordination algorithms, particularly consensus-based approaches and spatial rule systems, achieve superior performance in phantom jam mitigation compared to random behavior. Up to 50% AV penetration rate, all coordinated strategies maintain higher average speeds and traffic flow rates while reducing phantom jam formation time. Beyond this threshold, Consensus-Based Control prioritizes stability and faster wave dissipation, while Greedy and Spatial Control strategies maintain higher throughput at the cost of increased speed variance. These findings highlight the importance of selecting coordination algorithms based on specific phantom jam mitigation objectives and user comfort preferences.
 
 = Introduction
 
-Multi-agent systems research addresses fundamental challenges in distributed coordination, emergent behavior, and collective intelligence across diverse domains. Understanding how autonomous vehicles can effectively coordinate their actions in shared environments while maintaining individual objectives remains a central challenge in the field. Traffic environments provide an ideal testbed for studying these coordination mechanisms due to their inherent complexity, real-time constraints, and the need for both safety and efficiency.
+Phantom traffic jams—spontaneous congestion that emerges without visible causes such as accidents, construction, or bottlenecks—represent one of the most frustrating and economically costly phenomena in modern transportation systems. As demonstrated in CGP Grey's influential video "The Simple Solution to Traffic" @cgpgrey2017traffic, these mysterious traffic waves form when small disturbances in vehicle flow cascade through traffic, creating stop-and-go patterns that can persist for hours and affect thousands of vehicles. The video illustrates how even minor driver reactions can propagate backward through traffic, forming jams that seem to appear from nowhere, and proposes autonomous vehicles as a potential solution to this pervasive problem.
 
-Multi-agent coordination in dynamic environments presents unique challenges including partial observability, real-time decision making, and the need to balance individual vehicle goals with collective system performance. Traditional approaches often struggle with scalability and robustness when vehicles must operate in environments with heterogeneous participants exhibiting different behavioral patterns and capabilities.
-
-This project investigates distributed coordination strategies for autonomous vehicles operating in a shared circular environment, where they must navigate while interacting with human-driven vehicles following realistic behavioral models. The project addresses fundamental questions about how vehicle coordination mechanisms scale, how emergent collective behaviors arise from individual vehicle actions, and how different coordination paradigms affect overall system performance.
-
-The primary objectives of this work are: (1) to develop a comprehensive multi-agent simulation environment that models both autonomous vehicles and human-driven vehicles, (2) to implement and compare different distributed coordination algorithms for collective behavior optimization, (3) to analyze the impact of varying autonomous vehicle population ratios on emergent system properties, and (4) to evaluate the effectiveness of different spatial organization strategies in mixed-vehicle scenarios.
+This project aims to expand on the scope of the video, investigating how introducing autonomous vehicles with different coordination strategies affects phantom jam dynamics in a shared circular environment, where they must navigate while interacting with human-driven vehicles following realistic behavioral models. The project addresses fundamental questions about how vehicle coordination mechanisms scale, how emergent collective behaviors arise from individual vehicle actions, and how different coordination paradigms affect overall system performance in the context of phantom jam mitigation.
 
 = Methodology
 
 == Simulation Environment
 
-Our multi-agent simulation environment is built using the Gymnasium framework. The environment models a circular spatial domain with configurable dimensions, typically set to 1000 units to ensure complex agent interactions while maintaining computational efficiency.
+Our multi-agent simulation environment is built using the Gymnasium framework. The environment models a circular one-lane highway with configurable dimensions, with the default at 1000 units to ensure complex agent interactions while maintaining computational efficiency. This circular highway design is inspired by the experimental setup used by Sugiyama et al. @sugiyama2008, who demonstrated the spontaneous formation of phantom jams in controlled circular track experiments.
 
 The circular topology eliminates boundary effects and creates a controlled environment for studying emergent collective behaviors. This design choice enables observation of emergent phenomena such as clustering, wave propagation, and coordination patterns that arise from vehicle interactions. The environment supports heterogeneous vehicle populations with configurable ratios of autonomous vehicles and human-driven vehicles, enabling systematic analysis of how vehicle composition affects system-wide emergent properties.
 
@@ -74,7 +70,7 @@ The circular topology eliminates boundary effects and creates a controlled envir
 
 === Human-Driven Vehicle Model
 
-Human-driven vehicle behavior is modeled using the Intelligent Driver Model (IDM), a well-established behavioral model that captures realistic decision-making patterns based on local environmental conditions. The IDM considers factors such as desired velocity, preferred spatial separation, action capabilities, and reaction to neighboring vehicles. The model parameters are calibrated to represent typical human driving patterns, including response characteristics and spatial preferences.
+Human-driven vehicle behavior is modeled using the Intelligent Driver Model (IDM) @treiber2000, a well-established behavioral model that captures realistic decision-making patterns based on local environmental conditions. The IDM considers factors such as desired velocity, preferred spatial separation, action capabilities, and reaction to neighboring vehicles. The model parameters are calibrated to represent typical human driving patterns, including response characteristics and spatial preferences.
 
 The IDM implementation ensures that human-driven vehicles exhibit realistic variability in behavior, including different response times and decision-making patterns. This variability is crucial for creating realistic heterogeneous traffic scenarios and testing the robustness of autonomous vehicle coordination strategies under diverse environmental conditions.
 
@@ -86,7 +82,7 @@ Our framework implements four distinct autonomous vehicle coordination strategie
 
 *Greedy Local Optimization:* Implements a reactive controller that adjusts vehicle behavior based on immediate local conditions. The controller considers the proximity to neighboring vehicles and applies actions to maintain safe interactions while attempting to reach individual objectives.
 
-*Spatial Rule-Based Control:* This rule-based approach focuses on optimal spatial organization by maintaining balanced positioning relative to neighboring vehicles. The algorithm dynamically computes safe zones based on current states and applies safety-critical actions when necessary. When not in emergency situations, the controller attempts to position the vehicle optimally within its neighborhood, promoting stable collective patterns and reducing oscillatory behaviors.
+*Spatial Rule-Based Control:* This strategy implements the "stay in the middle" approach highlighted in CGP Grey's video @cgpgrey2017traffic as a simple yet effective solution to phantom jams. The algorithm focuses on maintaining balanced positioning relative to neighboring vehicles by positioning each autonomous vehicle equidistantly between the car in front and the car behind. This rule-based approach dynamically computes safe zones based on current states and applies safety-critical actions when necessary. When not in emergency situations, the controller attempts to position the vehicle optimally within its neighborhood, promoting stable collective patterns and reducing the oscillatory behaviors that lead to phantom jam formation.
 
 *Consensus-Based Control (CBC):* This advanced strategy implements distributed coordination among autonomous vehicles. Each vehicle updates its actions based on state differences with neighboring autonomous vehicles while maintaining safety constraints. The algorithm includes two main components: a consensus term that promotes state coordination among vehicles and a recovery term that drives individual vehicles toward their desired states. The mathematical formulation ensures that the autonomous vehicle collective converges to coordinated behavior while avoiding conflicts.
 
@@ -95,13 +91,32 @@ Our framework implements four distinct autonomous vehicle coordination strategie
 The Spatial Rule-Based Control computes target positions by:
 $p_"target" = 0.5(p_"front" + p_"back")$
 
-with safety constraints ensuring that minimum separation distance $d_"min" = f(s_i, s_"max")$ is always maintained.
+where:
+- $p_"target"$ is the desired target position for the autonomous vehicle
+- $p_"front"$ is the current position of the vehicle directly ahead
+- $p_"back"$ is the current position of the vehicle directly behind
+
+The algorithm also enforces safety constraints ensuring that minimum separation distance $d_"min" = f(s_i, s_"max")$ is always maintained, where:
+- $d_"min"$ is the minimum safe following distance
+- $s_i$ is the current speed of vehicle $i$
+- $s_"max"$ is the maximum speed limit
+
+The Spatial Rule-Based Control algorithm uses dynamic braking distance calculations based on the current vehicle speed, rather than fixed minimum distance values. The algorithm computes braking distance as $d_"braking" = v^2 / (2 \cdot |a_"max"|)$ where $v$ is the current speed and $a_"max" = 5.0$ m/s² is the maximum deceleration capability.
 
 The Consensus-Based Control algorithm operates by having each autonomous vehicle $i$ calculate its action as:
 
 $a_i = k_c sum_(j in N_i) (s_j - s_i) + k_r (s_d - s_i)$
 
-where $k_c$ is the consensus gain, $k_r$ is the recovery gain, $s_d$ is the desired state, and $N_i$ represents the set of neighboring autonomous vehicles.
+where:
+- $a_i$ is the control action (acceleration/deceleration) for vehicle $i$
+- $k_c$ is the consensus gain, controlling how strongly vehicles coordinate with neighbors
+- $k_r$ is the recovery gain, controlling how strongly vehicles move toward their desired state
+- $s_i$ is the current state (position and velocity) of vehicle $i$
+- $s_j$ is the current state of neighboring autonomous vehicle $j$
+- $s_d$ is the desired target state for the vehicle
+- $N_i$ represents the set of neighboring autonomous vehicles within communication range of vehicle $i$
+
+We choose the arbitrary values of $k_c = 0.5$ and $k_r = 0.2$ for the Consensus-Based Control algorithm.
 
 == Vehicle Distribution Strategies
 
@@ -113,48 +128,105 @@ The implemented code allows for three distribution strategies determine the init
 
 *Random Distribution:* Vehicles are distributed randomly throughout the environment, representing realistic deployment scenarios where autonomous vehicle presence occurs gradually and unpredictably.
 
-For the report, we only used the interleaved distribution strategy.
-
 = Results and Analysis
 
 == Experimental Setup
 
-Our experimental evaluation focuses on comparing the performance of different autonomous vehicle coordination strategies under varying conditions. The simulation parameters were configured to represent diverse traffic scenarios, with vehicle velocities ranging from 16 to 30 units/s and autonomous vehicle population ratios varying from 0% to 100% in increments of 10%.
+Our experimental evaluation focuses on comparing the performance of different autonomous vehicle coordination strategies under varying conditions. The simulation parameters were configured to represent diverse traffic scenarios, with vehicle velocities ranging from 16 to 30 units/s and autonomous vehicle population ratios varying from 10% to 90% in increments of 10%.
 
-Key performance metrics include traffic flow rate (vehicles per second passing a fixed measurement point), average vehicle speed across all vehicles, speed variance (indicating traffic stability), wave formation time (time for traffic waves to form after perturbations), and wave dissipation time (time for traffic waves to dissipate).
+Key performance metrics include:
+- Traffic flow rate (vehicles per second passing a fixed measurement point)
+- Average vehicle speed across all vehicles
+- Speed variance (indicating capacity in maintaining a stable speed)
+- Wave formation time (time for traffic waves to form after perturbations)
+- Wave dissipation time (time for traffic waves to dissipate).
 
 Controlled perturbation, in the form of timed brake events from a pre-selected vehicle, were introduced to test system resilience and evaluate how different coordination strategies respond to environmental disturbances.
 
-== Performance Comparison
+We ran multiple simulations with the following parameters:
 
-// TODO: actually write based on the resultsz
-Initial results demonstrate significant differences between coordination strategies. The Consensus-Based Control shows superior performance in maintaining system stability, with reduced state variance compared to baseline scenarios. The coordination mechanism effectively dampens oscillatory patterns and promotes smoother collective behavior across the autonomous vehicle population.
+- 100 vehicles
+- 10000m track
+- 3600 simulated seconds (360000 steps)
+- 10% to 90% AV penetration rate
+- Random distribution strategy
 
-The Spatial Rule-Based Control demonstrates excellent coordination effectiveness, maintaining optimal spatial organization while achieving comparable collective performance. This strategy proves particularly effective in heterogeneous scenarios where maintaining stable interactions between autonomous vehicles and human-driven vehicles is critical.
+== Results and Analysis
 
-Random behavior, as expected, provides minimal improvement over human-only traffic systems, confirming the importance of intelligent coordination mechanisms. Greedy local optimization shows moderate improvements in individual performance but lacks the global coordination benefits of more sophisticated strategies.
+When comparing the performance of the different coordination strategies, we can see that the Consensus-Based Control (CBC) and the Spatial Rule-Based Control (SBC) are the best performing strategies.
 
-== Collective Behavior Analysis
+When analysing the Average Vehicle Speed, we can see that, when comparing with the Random Behavior strategy, the three strategies (Greedy, CBC and SBC) are able to maintain a higher average speed until the AV penetration rate reaches around 50%.
 
-// TODO: actually write based on the resultsz
-Analysis of emergent collective patterns reveals that higher autonomous vehicle population ratios generally improve overall system performance, but the relationship is non-linear and depends heavily on the chosen coordination strategy. Consensus-Based Control shows the most dramatic improvements, with benefits becoming apparent at autonomous vehicle ratios as low as 25%.
+#figure(
+  image("./images/average_speed.png", width: 100%),
+  caption: [
+    Average vehicle speed across different AV penetration rates and control strategies.
+  ]
+)
 
-The choice of distribution strategy significantly impacts performance outcomes. Interleaved distribution generally provides the best overall results by maximizing the beneficial influence of autonomous vehicles on human-driven vehicles. Clustered distribution shows advantages for certain metrics but may create local coordination at the expense of global system performance.
+After that, we see a drop in the average speed of the CBC strategy.
 
-Response to environmental perturbations demonstrates the superior adaptability of coordinated autonomous vehicle strategies. Both CBC and spatial rule-based control show faster recovery times and reduced propagation of disturbances compared to uncoordinated approaches.
+We can observe the same pattern for the Traffic Flow Rate.
 
-= Conclusion and Future Work
+#figure(
+  image("./images/flow_rate.png", width: 100%),
+  caption: [
+    Traffic flow rate across different AV penetration rates and control strategies.
+  ]
+)
 
-// TODO: rewrite
-This project demonstrates the significant potential of distributed coordination strategies to achieve superior collective behavior in traffic systems. Our simulation framework successfully models complex vehicle interactions and provides a robust platform for evaluating different coordination approaches in dynamic traffic environments.
+This can be explained by looking at the Speed Variance graph, where we can see that the speed variance after 50% AV penetration rate incresases for the Greedy and SBC strategies, while the CBC strategy maintains a lower speed variance.
 
-Key findings indicate that coordination among autonomous vehicles, rather than individual optimization, provides the greatest benefits for overall traffic system performance. The Consensus-Based Control algorithm shows particular promise, achieving substantial improvements in collective stability and coordination effectiveness even at moderate autonomous vehicle population ratios.
+#figure(
+  image("./images/speed_variance.png", width: 100%),
+  caption: [
+    Speed variance across different AV penetration rates and control strategies.
+  ]
+)
 
-The Spatial Rule-Based Control proves effective for maintaining traffic organization, ensuring appropriate spatial relationships while contributing to overall collective optimization. The framework's flexibility in testing different distribution strategies reveals important insights for autonomous vehicle deployment in heterogeneous traffic environments.
+This indicates that, while the Greedy and SBC agents brake and accelerate more often to maintain flow and speed, the CBC is more stable and smoother in its behavior, antecipating the actions of the other agents and maintaining a more consistent speed.
 
-Current limitations include the simplified circular spatial domain and the absence of more complex traffic scenarios such as dynamic topology changes, varying environmental conditions, and heterogeneous vehicle capabilities. Future work should extend the framework to multi-dimensional spaces, incorporate vehicle-to-vehicle communication protocols, and validate findings through diverse traffic application domains.
+When analysing the Wave Formation Time, the three strategies have lower wave formation times than the Random Behavior strategy until the 50% AV penetration rate. After that, the CBC maintains its lower wave formation time, while the Greedy and SBC strategies increase a lot.
 
-Additional research directions include the development of adaptive coordination strategies that can adjust their behavior based on traffic conditions, integration with hierarchical coordination systems, and investigation of scalability benefits through distributed autonomous vehicle operation. The framework's extensible design facilitates these future enhancements and supports continued research in autonomous vehicle coordination strategies and emergent collective traffic behavior.
+#figure(
+  image("./images/wave_formation.png", width: 100%),
+  caption: [
+    Wave formation time across different AV penetration rates and control strategies.
+  ]
+)
+
+This indicates that the SBC and Greedy strategies form bigger waves, having the AVs reaching the wave faster than the CBC strategy, consequence of the higher average speed of the SBC and Greedy strategies.
+
+When analysing the Wave Dissipation Time, we can see that the CBC strategy has a lower wave dissipation time, than the SBC and than the Greedy strategy. This indicates that the CBC strategy is able to dissipate the wave faster than the other strategies, altough the difference is not that significant.
+
+#figure(
+  image("./images/wave_dissipation.png", width: 100%),
+  caption: [
+    Wave dissipation time across different AV penetration rates and control strategies.
+  ]
+)
+
+The random behaviour strategy doesn't have a wave dissipation time, because it was unable to dissipate the wave. As such, we couldn't plot it.
+
+== Autonomous Vehicle Population Ratio Analysis
+
+When analysing the metrics evolution with the change in the Autonomous Vehicle Population Ratio, we could see an improvment in the average speed and the traffic flow rate when the AVs have defined a strategy to follow.
+
+After 50% AV penetration rate, we can see a choice between having a more reactive, but more unstable strategy, choosing a Greedy or a SBC strategy, or having a more stable speed and flow strategy, choosing a CBC strategy.
+
+The choice of algorithms should have in mind its application. Perhaps the users don't want to always be accelerating and braking, and would prefer a more stable speed and flow. On the other way, if the users want to sacrifice comfort for a more efficient flow, they could choose the Greedy or SBC strategy.
+
+= Conclusion
+
+This project demonstrates the significant potential of distributed coordination strategies to achieve superior collective behavior in traffic systems. Our simulation framework, while being a simple model, was able to show the potential of the different coordination strategies.
+
+The results show that the Consensus-Based Control (CBC) and the Spatial Rule-Based Control (SBC) are the best performing strategies, achieving superior collective performance and system stability compared to individualistic vehicle strategies.
+
+The Autonomous Vehicle Population Ratio Analysis shows that the choice of algorithms should have in mind its application. Perhaps the users don't want to always be accelerating and braking, and would prefer a more stable speed and flow. On the other way, if the users want to sacrifice comfort for a more efficient flow, they could choose the Greedy or SBC strategy.
+
+The current model is a simple model, with a circular spatial domain and a fixed number of vehicles. It would be interesting to see how the different coordination strategies perform in a more complex spatial domain, with more vehicles and more complex traffic scenarios.
+
+It would also be interesting to see how the different coordination strategies perform in a more complex spatial domain, with more vehicles and more complex traffic scenarios.
 
 #bibliography(
   "refs.bib",
