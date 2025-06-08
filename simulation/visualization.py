@@ -6,12 +6,6 @@ from .metrics import MetricsTracker
 class HighwayVisualizer:
     def __init__(self, env):
         self.env = env
-        self.fig = plt.figure(figsize=(15, 10))
-        
-        # Create subplots for highway and metrics
-        self.ax_highway = self.fig.add_subplot(121)
-        self.ax_metrics = self.fig.add_subplot(122)
-        
         self.vehicle_patches = []
         self.speed_texts = []
         self.braking_vehicles = set()
@@ -22,16 +16,31 @@ class HighwayVisualizer:
         # Initialize metrics tracker
         self.metrics_tracker = MetricsTracker(env.track_length, env.num_vehicles)
         
-        # Setup the visualization
-        self.setup_plot()
-        
-        # Connect the pick event
-        self.fig.canvas.mpl_connect('pick_event', self.on_pick)
-        # Connect close event
-        self.fig.canvas.mpl_connect('close_event', self.on_close)
+        # Only create matplotlib objects if plotting is enabled
+        if self.plot_graphs:
+            self.fig = plt.figure(figsize=(15, 10))
+            
+            # Create subplots for highway and metrics
+            self.ax_highway = self.fig.add_subplot(121)
+            self.ax_metrics = self.fig.add_subplot(122)
+            
+            # Setup the visualization
+            self.setup_plot()
+            
+            # Connect the pick event
+            self.fig.canvas.mpl_connect('pick_event', self.on_pick)
+            # Connect close event
+            self.fig.canvas.mpl_connect('close_event', self.on_close)
+        else:
+            self.fig = None
+            self.ax_highway = None
+            self.ax_metrics = None
         
     def setup_plot(self):
         """Initialize the plot with the circular highway and metrics display."""
+        if not self.plot_graphs:
+            return
+            
         # Setup highway plot
         self.ax_highway.clear()
         self.vehicle_patches = []
@@ -74,6 +83,9 @@ class HighwayVisualizer:
         
     def update_metrics_display(self):
         """Update the metrics display with current values."""
+        if not self.plot_graphs:
+            return
+            
         self.ax_metrics.clear()
         self.ax_metrics.axis('off')
         
@@ -133,17 +145,18 @@ class HighwayVisualizer:
             
         self.running = False
         
-        # Stop the event loop
-        try:
-            self.fig.canvas.stop_event_loop()
-        except Exception:
-            pass
-            
-        # Close the figure
-        try:
-            plt.close(self.fig)
-        except Exception:
-            pass
+        if self.plot_graphs and self.fig is not None:
+            # Stop the event loop
+            try:
+                self.fig.canvas.stop_event_loop()
+            except Exception:
+                pass
+                
+            # Close the figure
+            try:
+                plt.close(self.fig)
+            except Exception:
+                pass
             
     def on_pick(self, event):
         """Handle pick events when a vehicle is clicked."""
@@ -167,6 +180,10 @@ class HighwayVisualizer:
             
         # Update metrics
         self.metrics_tracker.update(state)
+        
+        # If not plotting, just return
+        if not self.plot_graphs:
+            return self.running
         
         # Remove old vehicle patches and text
         for patch in self.vehicle_patches:

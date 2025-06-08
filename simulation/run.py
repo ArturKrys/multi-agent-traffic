@@ -176,7 +176,10 @@ def main(user_input = True, num_vehicles=None, av_percentage=None, position_type
         print(f"  Brake acceleration: {braking_status['brake_acceleration']} m/s²")
     
     try:
-        # Run simulation indefinitely
+        # Run simulation
+        step_count = 0
+        max_steps = sim_duration if sim_duration is not None else None
+        
         while vis.running:
             if agent_type in ['consensus', 'in_the_middle', 'greedy', 'random']:
                 # No need to provide actions; environment computes them
@@ -189,6 +192,12 @@ def main(user_input = True, num_vehicles=None, av_percentage=None, position_type
                     size=env.num_av
                 )
                 state, rewards, terminated, truncated, _ = env.step(av_actions)
+            
+            step_count += 1
+            
+            # Check time-based termination (for non-interactive mode)
+            if max_steps is not None and step_count >= max_steps:
+                break
             
             # Update visualization
             if not vis.update(state):
