@@ -1,4 +1,7 @@
 # Multi-Agent Traffic Simulation
+
+https://github.com/user-attachments/assets/93014997-37cf-49d6-a935-21082e5d4ace
+
 ### AASMA (Autonomous Agents and Multi-Agent Systems) 2024/2025 Course Project
 
 A multi-agent traffic simulation environment featuring autonomous and human-driven vehicles on a circular highway. The environment is built using Gymnasium and features:
